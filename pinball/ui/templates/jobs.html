@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block page_title %}
+Pinball - Jobs
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript" charset="utf-8">
+    function constructProgressChart(percentages) {
+        var result = '<div class="progress">';
+        var TEMPLATES = {
+            "": '<div class="progress-bar" role="progressbar" style="width: 0%; margin-left: X%;">' +
+                  '</div>',
+            "SUCCESS" : '<div class="progress-bar progress-bar-success" role="progressbar" style="width: X%;"></div>',
+            "FAILURE" : '<div class="progress-bar progress-bar-danger" role="progressbar" style="width: X%;"></div>',
+            "RUNNING" : '<div class="progress-bar" style="width: X%;"></div>'
+        };
+        for (var i = 0; i < percentages.length; ++i) {
+            var percentage = percentages[i][0];
+            var status = percentages[i][1];
+            result += TEMPLATES[status].replace(/X/, percentage);
+        }
+        result += "</div>";
+        return result;
+    }
+
+    /**
+     * Format a row in the jobs table.
+     * @param {Object} nRow "TR" element for the current row.
+     * @param {Array} aData The data corresponding to the row.
+     * @param {number} iDataIndex The index of this row in the data.
+     */
+    function addExecutionsLinks(nRow, aData, iDataIndex) {
+        $("td:eq(0)", nRow).html('<a href="/executions/?workflow=' +
+            aData["workflow"] + "&instance=" + aData["instance"] +
+            "&job=" + aData["job"] + '">' + aData["job"] + "</a>");
+        var info  = "<b>" + aData["job_type"] + "</b>: " + aData["info"];
+        if (aData["priority"] !== 0) {
+            info += "<br/><b>priority</b>: " + aData["priority"];
+        }
+        if (aData["emails"].length > 0) {
+            info += "<br/><b>emails</b>: " + aData["emails"].join(" ");
+        }
+        if (aData["max_attempts"] > 1) {
+            info += "<br/><b>max_attempts</b>: " + aData["max_attempts"];
+        }
+        if (aData["retry_delay_sec"] > 0) {
+            info += "<br/><b>retry_delay_sec</b>: " + aData["retry_delay_sec"];
+        }
+        var warnTimeoutSec = aData["warn_timeout_sec"];
+        if (warnTimeoutSec !== null) {
+            info += "<br/><b>warn_timeout</b>: " +
+                jintervals(warnTimeoutSec, "{D}d {h}h {m}m {s}s");
+        }
+        var abortTimeoutSec = aData["abort_timeout_sec"];
+        if (abortTimeoutSec !== null) {
+            info += "<br/><b>abort_timeout</b>: " +
+                jintervals(abortTimeoutSec, "{D}d {h}h {m}m {s}s");
+        }
+        $("td:eq(1)", nRow).html(info);
+        var progressChart = constructProgressChart(aData["progress"]);
+        $("td:eq(2)", nRow).html(progressChart);
+        if (aData["status"] == "SUCCESS") {
+            $("td:eq(3)", nRow).addClass("text-success");
+        } else if (aData["status"] == "FAILURE") {
+            $("td:eq(3)", nRow).addClass("text-danger");
+        } else if (aData['status'] == "RUNNING") {
+            $("td:eq(3)", nRow).addClass("text-info");
+        }
+        var runTime = aData["run_time"];
+        if (runTime === null) {
+            runTime = '';
+        } else {
+            runTime = jintervals(runTime, "{D}d {h}h {m}m {s}s");
+        }
+        $("td:eq(6)", nRow).html(runTime);
+    }
+
+    /**
+     * Send command request to the server.
+     * @param {String} command The command to run.
+     */
+    function runCommand(command) {
+        jobs = getSelectedJobs().join();
+        makeAjaxCall("/ajax/command/?" + $.param({
+                         "command": command,
+                         "workflow": "{{ request.GET.workflow }}",
+                         "instance": "{{ request.GET.instance }}",
+                         "jobs": jobs}),
+                     "",
+                     commandCallback("#modal-" + command));
+    }
+
+    statusData = {"workflow": "{{ request.GET.workflow }}",
+                  "instance": "{{ request.GET.instance }}"};
+
+    init = function() {
+        baseInit();
+        $("#modal-poison,#modal-disable,#modal-enable").on("show.bs.modal",
+            function (e) {
+                showJobs();
+            });
+        $("#graph").load("/graph/?workflow={{ request.GET.workflow }}&" +
+                         "instance={{ request.GET.instance }}", graphLoaded);
+
+        oTable = $('#jobs').dataTable({
+            "sPaginationType": "bootstrap",
+            "oLanguage": {
+                "sLengthMenu": "_MENU_ records per page"
+            },
+            "bProcessing": true,
+            "sAjaxSource": "/ajax/jobs/?workflow={{ request.GET.workflow }}&" +
+                           "instance={{ request.GET.instance }}",
+            "fnCreatedRow": addExecutionsLinks,
+            "aoColumns": [
+                { "mData": "job" },
+                { "mData": "info" },
+                { "mData": "progress" },
+                { "mData": "status" },
+                { "mData": "last_start_time" },
+                { "mData": "last_end_time" },
+                { "mData": "run_time" }
+            ],
+            "fnServerData": getTableData,
+            "aaSorting": [[ 4, "asc" ]],
+            "aLengthMenu": [[10, 25, 50, 100, -1],
+                            [10, 25, 50, 100, "All"]],
+            "iDisplayLength": -1,
+        });
+    };
+</script>
+{% endblock %}
+
+{% block workflows_active %}
+class="active"
+{% endblock %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb">
+  <li></li>
+  <li>
+      <a href="/instances/?workflow={{ request.GET.workflow }}">
+          {{ request.GET.workflow }}
+      </a>
+  </li>
+  <li class="active">{{ request.GET.instance }}</li>
+  <li class="dropdown pull-right">
+      <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+          Action<span class="caret"></span>
+      </a>
+      <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+          <li class="description" title="Finish all currently running jobs, don't start new ones">
+            <a tabindex="-1" href="#modal-drain" data-toggle="modal">Drain</a>
+          </li>
+          <li class="description" title="Stop the drain process">
+            <a tabindex="-1" href="#modal-undrain" data-toggle="modal">Undrain</a>
+          </li>
+          <li class="description" title="Abort the instance">
+            <a tabindex="-1" href="#modal-abort" data-toggle="modal">Abort</a>
+          </li>
+          <li class="description" title="Cancel abort. No-op if for finished workflows.">
+            <a tabindex="-1" href="#modal-unabort" data-toggle="modal">Unabort</a>
+          </li>
+          <li class="description" title="Retry failed jobs.">
+            <a tabindex="-1" href="#modal-retry" data-toggle="modal">Retry</a>
+          </li>
+          <li class="description" title="Run the selected jobs and all its direct and indirect dependents">
+            <a tabindex="-1" href="#modal-poison" data-toggle="modal">Poison</a>
+          </li>
+          <li class="description" title="Do not run the selected jobs, mark as successful immediately after it becomes runnable">
+            <a tabindex="-1" href="#modal-disable" data-toggle="modal">Disable</a>
+          </li>
+          <li class="description" title="Enable disabled jobs.">
+            <a tabindex="-1" href="#modal-enable" data-toggle="modal">Enable</a>
+          </li>
+      </ul>
+  </li>
+</ol>
+{% endblock breadcrumb %}
+
+{% block modal %}
+{% include 'modal.html' with modal_id='modal-drain' command='drain' title='Drain' context='&workflow='|add:request.GET.workflow|add:'&instance='|add:request.GET.instance description='Drain workflow <b>'|add:request.GET.workflow|add:'</b> instance <b>'|add:request.GET.instance|add:'</b>'|safe %}
+{% include 'modal.html' with modal_id='modal-undrain' command='undrain' title='Undrain' context='&workflow='|add:request.GET.workflow|add:'&instance='|add:request.GET.instance description='Undrain workflow <b>'|add:request.GET.workflow|add:'</b> instance <b>'|add:request.GET.instance|add:'</b>'|safe %}
+{% include 'modal.html' with modal_id='modal-abort' command='abort' title='Abort' context='&workflow='|add:request.GET.workflow|add:'&instance='|add:request.GET.instance description='Abort workflow <b>'|add:request.GET.workflow|add:'</b> instance <b>'|add:request.GET.instance|add:'</b>'|safe %}
+{% include 'modal.html' with modal_id='modal-unabort' command='unabort' title='Unabort' context='&workflow='|add:request.GET.workflow|add:'&instance='|add:request.GET.instance description='Unabort workflow <b>'|add:request.GET.workflow|add:'</b> instance <b>'|add:request.GET.instance|add:'</b>'|safe %}
+{% include 'modal.html' with modal_id='modal-retry' command='retry' title='Retry' context='&workflow='|add:request.GET.workflow|add:'&instance='|add:request.GET.instance description='Retry failed jobs in <b>'|add:request.GET.workflow|add:'</b> instance <b>'|add:request.GET.instance|add:'</b>'|safe %}
+{% include 'modal.html' with modal_id='modal-poison' title='Poison' onclick="runCommand('poison')" description='Poison workflow <b>'|add:request.GET.workflow|add:'</b> instance <b>'|add:request.GET.instance|add:'</b> roots <b><span id="poison-jobs"></span></b>'|safe %}
+{% include 'modal.html' with modal_id='modal-disable' title='Disable' onclick="runCommand('disable')" description='Disable workflow <b>'|add:request.GET.workflow|add:'</b> instance <b>'|add:request.GET.instance|add:'</b> jobs <b><span id="disable-jobs"></span></b>'|safe %}
+{% include 'modal.html' with modal_id='modal-enable' title='Enable' onclick="runCommand('enable')" description='Enable workflow <b>'|add:request.GET.workflow|add:'</b> instance <b>'|add:request.GET.instance|add:'</b> jobs <b><span id="enable-jobs"></span></b>'|safe %}
+{% endblock modal %}
+
+{% block content %}
+<div class="row">
+  <a href="#jobs"><i class="icon-arrow-down"></i>jobs list</a>
+  {% include 'svg.html' %}
+  <table cellpadding="0" cellspacing="0" border="0"
+         class="table table-striped table-bordered" id="jobs">
+      <thead><tr>
+          <th width="10%">Job</th>
+          <th width="40%">Info</th>
+          <th width="10%">Progress</th>
+          <th width="10%">Status</th>
+          <th width="10%">Last Start</th>
+          <th width="10%">Last End</th>
+          <th width="10%">Run Time</th>
+      </tr></thead>
+      <tbody></tbody>
+  </table>
+</div>
+{% endblock %}

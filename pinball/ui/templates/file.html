@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block page_title %}
+Pinball - File
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript" charset="utf-8">
+    statusData = {"workflow": "{{ request.GET.workflow }}",
+                  "instance": "{{ request.GET.instance }}"};
+</script>
+{% endblock %}
+
+{% block workflows_active %}
+class="active"
+{% endblock %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb">
+  <li></li>
+  <li>
+      <a href="/instances/?workflow={{ request.GET.workflow }}">
+          {{ request.GET.workflow }}
+      </a>
+  </li>
+  <li>
+      <a href="/jobs/?workflow={{ request.GET.workflow }}&instance={{ request.GET.instance }}">
+          {{ request.GET.instance }}
+      </a>
+  </li>
+  <li>
+      <a href="/executions/?workflow={{ request.GET.workflow }}&instance={{ request.GET.instance }}&job={{ request.GET.job }}">
+          {{ request.GET.job }}
+      </a>
+  </li>
+  <li class="active">{{ request.GET.execution }}: {{ request.GET.log_type }}</li>
+</ol>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="container">
+  <pre id="log">
+      <embed id="file_content"
+             src="/file_content/?workflow={{ request.GET.workflow }}&instance={{ request.GET.instance }}&job={{ request.GET.job }}&execution={{ request.GET.execution }}&log_type={{ request.GET.log_type }}">
+      </embed>
+  </pre>
+
+</div>
+{% endblock %}

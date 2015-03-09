@@ -1,0 +1,13 @@
+include README.rst
+include CONTRIBUTING.rst
+include LICENSE
+include Makefile
+include MANIFEST.in
+include requirements.txt
+include tox.ini
+
+include pinball/ui/templates/*.html
+recursive-include pinball/ui/assets/css *.css *.png
+recursive-include pinball/ui/assets/fonts *.*
+recursive-include pinball/ui/assets/img *.png *.gif *.ico
+recursive-include pinball/ui/assets/js *.js

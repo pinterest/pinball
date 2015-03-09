@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block page_title %}
+Pinball - Schedules
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript" charset="utf-8">
+    function addJobsLink(nRow, aData, iDataIndex) {
+        $('td:eq(0)', nRow).html('<a href="/schedule/?workflow=' +
+            aData["workflow"] + '">' + aData["workflow"] + '</a>');
+        var recurrenceSeconds = parseInt(aData["recurrence_seconds"], 10);
+        var recurrence = jintervals(recurrenceSeconds, "{D}d {h}h {m}m {s}s");
+        $('td:eq(2)', nRow).html(recurrence);
+        $('td:eq(3)', nRow).html('<abbr title="' +
+            aData['overrun_policy_help'] + '">' +
+            aData['overrun_policy'] + '</abbr>');
+    }
+
+    init = function() {
+        baseInit();
+        oTable = $('#workflows').dataTable({
+            "sPaginationType": "bootstrap",
+            "oLanguage": {
+                "sLengthMenu": "_MENU_ records per page"
+            },
+            "bProcessing": true,
+            "sAjaxSource": "/ajax/schedules/",
+            "fnCreatedRow": addJobsLink,
+            "aoColumns": [
+                { "mData": "workflow" },
+                { "mData": "next_run_time" },
+                { "mData": "recurrence_seconds" },
+                { "mData": "overrun_policy" },
+                { "mData": "workflows_config" }
+            ],
+            "fnServerData": getTableData,
+            "aLengthMenu": [[10, 25, 50, 100, -1],
+                            [10, 25, 50, 100, "All"]],
+            "iDisplayLength": 100,
+        });
+    };
+</script>
+{% endblock %}
+
+{% block schedules_active %}
+class="active"
+{% endblock %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb">
+  <li></li>
+  <li class="active"></li>
+</ol>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="row">
+  <table cellpadding="0" cellspacing="0" border="0"
+         class="table table-striped table-bordered" id="workflows">
+      <thead>
+        <tr>
+          <th width="20%">Workflow</th>
+          <th width="20%">Next Run Time</th>
+          <th width="20%">Recurrence</th>
+          <th width="20%">Overrun Policy</th>
+          <th width="20%">Config</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+  </table>
+</div>
+{% endblock %}

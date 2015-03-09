@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+{% load i18n %}
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+  <!--<![endif]-->
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>{% block page_title %}{% endblock %}</title>
+
+    <meta name="author" content="Pawel Garbacki (pawel@pinterest.com)" />
+    <meta name="viewport" content="width=device-width" />
+    <link href="{{ STATIC_URL }}img/favicon.ico" rel="icon" type="image/x-icon" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/smoothness/jquery-ui-1.10.3.custom.css" type="text/css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap3/bootstrap.css" type="text/css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap3/dataTables.bootstrap.css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/widget/datepicker.css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/widget/select2.css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/widget/select2-bootstrap.css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/widget/bootstrap-timepicker.css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/utils/codemirror.css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/pinball.css" type="text/css" />
+    {% block css %}{% endblock %}
+  </head>
+
+  <body>
+    <!--[if lt IE 7]>
+    <p class="chromeframe">
+    You are using an outdated browser.
+    <a href="http://browsehappy.com/">
+    Upgrade your browser today
+    </a> or
+    <a href="http://www.google.com/chromeframe/?redirect=true">
+    install Google Chrome Frame
+    </a> to better experience this site.
+    </p>
+    <![endif]-->
+
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse"
+        data-target="#bs-example-navbar-collapse-1">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/workflows"><img src="{{ STATIC_URL }}img/logo.png" /></a>
+      </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li {% block workflows_active %}{% endblock %}>
+            <a href="/workflows">workflows</a>
+          </li>
+          <li {% block schedules_active %}{% endblock %}>
+            <a href="/schedules">schedules</a>
+          </li>
+          <li {% block tokens_active %}{% endblock %}>
+            <a href="/token_paths/?path=%2F">tokens</a>
+          </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li>
+            <a class="clock"></a>
+          </li>
+          <li>
+            <a>{{request.COOKIES.user_id}}</a>
+          </li>
+          <li>
+            <a href="/logout">logout</a>
+          </li>
+        </ul>
+      </div>
+      <!-- /.navbar-collapse -->
+    </nav>
+
+    <div class="container">
+      <span id="status-label" class="label label-warning label-status" style="z-index:300000;"></span>
+      <div id="info-box" class="alert alert-info alert-dismissable noshow row">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
+          &times;
+        </button>
+        <strong>Success! </strong>        <pre id="info-msg">Info</pre>
+      </div>
+
+      <div id="error-box" class="alert alert-danger alert-dismissable noshow row">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
+          &times;
+        </button>
+        <strong>Error! </strong>        <pre id="error-msg">Error</pre>
+      </div>
+
+      <div class="row">
+        <table border="0" width="100%">
+          <tr>
+            <td>
+            <div>
+              {% block breadcrumb %}
+              {% endblock breadcrumb %}
+            </div></td>
+          </tr>
+        </table>
+      </div>
+
+
+      {% include 'modal.html' with modal_id='modal-loading' %}
+      {% block modal %} {% endblock modal %} {% block content %} {% endblock content %}
+      <input type='hidden' name='csrfmiddlewaretoken' value='{{ csrf_token }}' />
+    </div>
+
+    <script src="{{ STATIC_URL }}js/vendor/jquery-1.9.1.js"></script>
+    <script src="{{ STATIC_URL }}js/vendor/jquery-ui-1.10.3.custom.js"></script>
+    <script src="{{ STATIC_URL }}js/jquery/jquery.autosize.js"></script>
+    <script src="{{ STATIC_URL }}js/jquery/jquery.svg.js"></script>
+    <script src="{{ STATIC_URL }}js/jquery/jquery.svganim.js"></script>
+    <script src="{{ STATIC_URL }}js/backbone/underscore.js"></script>
+    <script src="{{ STATIC_URL }}js/backbone/backbone.js"></script>
+    <script src="{{ STATIC_URL }}js/backbone/backbone-forms.js"></script>
+    <script src="{{ STATIC_URL }}js/backbone/list.js"></script>
+    <script src="{{ STATIC_URL }}js/backbone/editors.js"></script>
+    <script src="{{ STATIC_URL }}js/backbone/editors.bootstrap.js"></script>
+    <script src="{{ STATIC_URL }}js/bootstrap3/bootstrap.js"></script>
+    <script src="{{ STATIC_URL }}js/backbone/backbone.bootstrap-modal.js"></script>
+    <script src="{{ STATIC_URL }}js/widget/bootstrap-datepicker.js"></script>
+    <script src="{{ STATIC_URL }}js/widget/select2.js"></script>
+    <script src="{{ STATIC_URL }}js/widget/bootstrap-timepicker.js"></script>
+    <script src="{{ STATIC_URL }}js/widget/spin.js"></script>
+    <script src="{{ STATIC_URL }}js/utils/moment.js"></script>
+    <script src="{{ STATIC_URL }}js/utils/codemirror.js"></script>
+    <script src="{{ STATIC_URL }}js/utils/sql.js"></script>
+    <script src="{{ STATIC_URL }}js/utils/placeholder.js"></script>
+    <script src="{{ STATIC_URL }}js/vendor/jquery.dataTables.js"></script>
+    <script src="{{ STATIC_URL }}js/bootstrap3/dataTables.bootstrap.js"></script>
+    <script src="{{ STATIC_URL }}js/vendor/jintervals-0.7.js"></script>
+    <script src="{{ STATIC_URL }}js/vendor/jquery-svgpan.js"></script>
+    <script src="{{ STATIC_URL }}js/vendor/jquery.jclock.js"></script>
+    <script src="{{ STATIC_URL }}js/vendor/bootstrap-contextmenu.js"></script>
+    <script src="{{ STATIC_URL }}js/utils.js"></script>
+    <script src="{{ STATIC_URL }}js/graph.js"></script>
+    <script src="{{ STATIC_URL }}js/svg.js"></script>
+
+    <script>
+      function ajaxSetep() {
+        $.ajaxSetup({
+          beforeSend : function(xhr, settings) {
+            function getCookie(name) {
+              var cookieValue = null;
+              if (document.cookie && document.cookie != '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                  var cookie = jQuery.trim(cookies[i]);
+                  // Does this cookie string begin with the name we want?
+                  if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                  }
+                }
+              }
+              return cookieValue;
+            }
+
+            if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+              // Only send the token to relative URLs i.e. locally.
+              xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            }
+          }
+        });
+      }
+
+      function handleAjaxError(xhr, textStatus, error) {
+        if (textStatus === "timeout") {
+          $("#error-msg").html("The server took too long to " + "send the data");
+        } else {
+          $("#error-msg").html("An error occurred on the " + "server: " + error + "\n" + xhr.responseText);
+        }
+        $("#error-box").show();
+        $("#info-box").hide();
+        $('html, body').animate({
+          scrollTop : 0
+        }, 1000);
+      }
+
+      function handleLoadingAjaxError(xhr, textStatus, error) {
+        hideLoadingModal();
+        handleAjaxError(xhr, textStatus, error);
+      }
+
+      function makeAjaxCall(source, data, callback, errorCallback) {
+        errorCallback = typeof errorCallback !== 'undefined' ? errorCallback : handleAjaxError;
+        $.ajax({
+          "dataType" : 'json',
+          "type" : "GET",
+          "url" : source,
+          "data" : data,
+          "success" : callback,
+          "timeout" : 60000,
+          "error" : errorCallback // this sets up jQuery to give
+          // us errors
+        });
+      }
+
+      function makePostAjaxCall(source, data, callback, errorCallback) {
+        loadingModal();
+        errorCallback = typeof errorCallback !== 'undefined' ? errorCallback : handleAjaxError;
+        $.ajax({
+          "dataType" : 'json',
+          "type" : "POST",
+          "url" : source,
+          "data" : data,
+          "success" : callback,
+          "timeout" : 60000,
+          "error" : errorCallback // this sets up jQuery to give
+          // us errors
+        });
+      }
+
+      function handleTableDataError(xhr, textStatus, error) {
+        handleAjaxError(xhr, textStatus, error);
+        oTable.fnProcessingIndicator(false);
+      }
+
+      function getTableData(source, data, callback) {
+        makeAjaxCall(source, data, callback, handleTableDataError);
+      }
+
+      function clearBox() {
+        $("#info-msg").html('');
+        $("#info-box").hide('slow');
+        $("#error-msg").html('');
+        $("#error-box").hide('slow');
+      }
+
+      function commandCallback(modalId) {
+        return function(data, textStatus, xhr) {
+          $(modalId).modal("hide");
+          $("#info-msg").html(data);
+          $("#info-box").show();
+        };
+      }
+
+      function defaultCallback(data, textStatus, xhr) {
+        $("#info-msg").html(data);
+        $("#info-box").show();
+        $("#error-box").hide();
+        $('html, body').animate({
+          scrollTop : 0
+        }, 1000);
+      }
+
+      function loadingCallback(data, textStatus, xhr) {
+        hideLoadingModal();
+        defaultCallback(data, textStatus, xhr);
+      }
+
+      var statusData = {};
+
+      function statusCallback(data, textStatus, xhr) {
+        $("#status-label").html(data.join(" | "));
+      }
+
+      function getStatus() {
+        makeAjaxCall('/ajax/status/', statusData, statusCallback, handleAjaxError);
+      }
+
+      // Backend not yet implemented.
+      function periodicallyGetStatus() {
+        getStatus();
+        setInterval(getStatus, 10000);
+      }
+
+      function baseInit() {
+        jQuery.fn.dataTableExt.oApi.fnProcessingIndicator = function(oSettings, onoff) {
+          if ( typeof (onoff) == "undefined") {
+            onoff = true;
+          }
+          this.oApi._fnProcessingDisplay(oSettings, onoff);
+        };
+
+        $(".alert .close").click(function(e) {
+          $(this).parent().hide();
+        });
+
+        var options = {
+          utc : true,
+          format : "%Y-%m-%d %H:%M:%S UTC"
+        };
+        $(".clock").jclock(options);
+
+        if ($('.form-signin').length == 0) {
+          periodicallyGetStatus();
+        }
+
+        // Enable "Confirm" buttons in modals when they are displayed.
+        $("[id^='modal-']").on("shown", function() {
+          $("[id$='-confirm']").prop("disabled", false);
+        });
+
+        ajaxSetep();
+
+        $(window).bind("resize", function() {
+          if ( typeof oTable !== "undefined") {
+            oTable.fnAdjustColumnSizing();
+          }
+        });
+
+        $(".modal-wide").on("show.bs.modal", function() {
+          var height = $(window).height() - 200;
+          $(this).find(".modal-body").css("max-height", height);
+        });
+
+        $(".description").tooltip({
+            placement: "top",
+            container: 'body',
+        });
+
+        $(".signin-button").click(function(e) {
+          $("#signin-domain").val(e.target.id);
+          $("#signin-form").submit();
+        });
+      }
+
+      var init = baseInit;
+      var userEmail = "{{request.COOKIES.user_id}}";
+
+      $(document).ready(function() {
+        init();
+      });
+    </script>
+    {% block javascript %} {% endblock javascript %}
+  </body>
+</html>

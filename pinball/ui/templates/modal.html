@@ -1,0 +1,28 @@
+<div id="{{modal_id}}" class="modal fade" tabindex="-1"
+role="dialog" aria-labelledby="{{modal_id}}-label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-center">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"
+        aria-hidden="true">
+          x
+        </button>
+        <h3 id="{{modal_id}}-label">{{title}}</h3>
+      </div>
+      <div class="modal-body">
+          <p>
+            {{description}}
+          </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">
+          Cancel
+        </button>
+        <button id="{{modal_id}}-confirm" class="btn btn-primary"
+        onclick="{% if command %}$('#{{modal_id}}-confirm').prop('disabled', true); makeAjaxCall('/ajax/command/?command={{command}}{{context}}', '', commandCallback('#{{modal_id}}')){% else %}{{ onclick }}{% endif %}">
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

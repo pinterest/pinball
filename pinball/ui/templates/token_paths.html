@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block body_class %}{{ block.super }}{% endblock %}
+
+{% block page_title %}
+Pinball - Tokens
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript" charset="utf-8">
+    function addTokenPathsLinks(nRow, aData, iDataIndex) {
+        encodedPath = encodeURIComponent(aData["path"]);
+        pathString = aData["path"];
+        if (endsWith(pathString, "/")) {
+            pathString += "...";
+            $('td:eq(0)', nRow).html('<a href="/token_paths/?path=' +
+                encodedPath + '">' + pathString + '</a>');
+        } else {
+            $('td:eq(0)', nRow).html('<a href="/token/?path=' +
+                encodedPath + '">' + pathString + '</a>');
+
+        }
+    }
+    $(document).ready(function() {
+        oTable = $('#token_paths').dataTable( {
+            // "sDom": "r<'row'<'span6'l><'span6'>f>t<'row'<'span6'i><'span6'>p>",
+            "sPaginationType": "bootstrap",
+            "oLanguage": {
+                "sLengthMenu": "_MENU_ records per page"
+            },
+            "bProcessing": true,
+            "sAjaxSource": "/ajax/token_paths/?path={{ request.GET.path }}",
+            "fnCreatedRow": addTokenPathsLinks,
+            "aoColumns": [
+                { "mData": "path" },
+                { "mData": "count" },
+            ],
+            "fnServerData": getTableData
+        } );
+    } );
+</script>
+{% endblock %}
+
+{% block tokens_active %}
+class="active"
+{% endblock %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb">
+  <li></li>
+  {% for parent, prefix in parents %}
+   <li><a href="/token_paths/?path={{ prefix|urlencode:'' }}">{{ parent }}</a></li>
+  {% endfor %}
+  <li class="active">{{ basename }}</li>
+</ol>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="row">
+  <table cellpadding="0" cellspacing="0" border="0"
+         class="table table-striped table-bordered" id="token_paths">
+      <thead><tr>
+          <th width="85%">Path</th>
+          <th width="15%">Number of Tokens</th>
+      </tr></thead>
+      <tbody></tbody>
+  </table>
+</div>
+{% endblock %}

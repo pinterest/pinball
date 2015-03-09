@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block page_title %}
+Pinball - Workflows
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript" charset="utf-8">
+    function addInstancesLinks(nRow, aData, iDataIndex) {
+        $("td:eq(0)", nRow).html(aData['owners']);
+        $('td:eq(1)', nRow).html('<a href="/instances/?workflow=' +
+            aData["workflow"] + '">' + aData["workflow"] + '</a>');
+        if (aData["last_start_time"]) {
+            $('td:eq(3)', nRow).html('<a href="/jobs/?workflow=' +
+                aData["workflow"] + '&instance=' + aData["last_instance"] +
+                '">' + aData["last_start_time"] + '</a>');
+        }
+        if (aData["last_end_time"]) {
+            $('td:eq(4)', nRow).html('<a href="/jobs/?workflow=' +
+                aData["workflow"] + '&instance=' + aData["last_instance"] +
+                '">' + aData["last_end_time"] + '</a>');
+        }
+        if (aData['status'] == 'SUCCESS') {
+            $('td:eq(2)', nRow).addClass('text-success');
+        } else if (aData['status'] == 'FAILURE' ||
+                   aData['status'] == 'ABORTED') {
+            $('td:eq(2)', nRow).addClass('text-danger');
+        } else if (aData['status'] == 'RUNNING') {
+            $('td:eq(2)', nRow).addClass('text-info');
+        }
+        var run_time = aData["run_time"];
+        if (run_time === null) {
+            run_time = '';
+        } else {
+            run_time = jintervals(run_time, "{D}d {h}h {m}m {s}s");
+        }
+        $("td:eq(5)", nRow).html(run_time);
+    }
+
+    init = function() {
+        baseInit();
+        oTable = $('#workflows').dataTable( {
+            // "sDom": "r<'row'<'span6'l><'span6'>f><'row't><'row'<'span6'i><'span6'>p>",
+            "sPaginationType": "bootstrap",
+            "oLanguage": {
+                "sLengthMenu": "_MENU_ records per page"
+            },
+            "bProcessing": true,
+            "sAjaxSource": "/ajax/workflows/",
+            "fnCreatedRow": addInstancesLinks,
+            "aoColumns": [
+                { "mData": "owners" },
+                { "mData": "workflow" },
+                { "mData": "status" },
+                { "mData": "last_start_time" },
+                { "mData": "last_end_time" },
+                { "mData": "run_time" }
+            ],
+            "fnServerData": getTableData,
+            "aLengthMenu": [[10, 25, 50, 100, -1],
+                            [10, 25, 50, 100, "All"]],
+            "iDisplayLength": -1,
+        });
+    };
+</script>
+{% endblock %}
+
+{% block workflows_active %}
+class="active"
+{% endblock %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb">
+  <li></li>
+  <li class="active"></li>
+  <li class="dropdown pull-right">
+      <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+          Action<span class="caret"></span>
+      </a>
+      <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+        <li class="description" title="Finish all currently running jobs, don't start new ones">
+          <a tabindex="-1" href="#modal-drain" data-toggle="modal">Drain</a>
+        </li>
+        <li class="description" title="Stop the drain process">
+          <a tabindex="-1" href="#modal-undrain" data-toggle="modal">Undrain</a>
+        </li>
+        <li class="description" title="Admin only. Don't touch.">
+          <a tabindex="-1" href="#modal-exit" data-toggle="modal">Drain and exit</a>
+        </li>
+        <li class="description" title="Admin only. Don't touch.">
+          <a tabindex="-1" href="#modal-unexit" data-toggle="modal">Undrain and unexit</a>
+        </li>
+      </ul>
+  </li>
+</ol>
+{% endblock breadcrumb %}
+
+{% block modal %}
+{% include 'modal.html' with modal_id='modal-drain' command='drain' title='Drain' context='' description='Drain all workflows' %}
+{% include 'modal.html' with modal_id='modal-undrain' command='undrain' title='Undrain' context='' description='Undrain all workflows' %}
+{% include 'modal.html' with modal_id='modal-exit' command='exit' title='Drain and exit' context='' description='Drain and exit all workflows' %}
+{% include 'modal.html' with modal_id='modal-unexit' command='unexit' title='Undrain and unexit' context='' description='Undrain and unexit all workflows' %}
+{% include 'modal.html' with modal_id='modal-abort' command='abort' title='Abort' context='' description='Abort all workflows' %}
+{% include 'modal.html' with modal_id='modal-unabort' command='unabort' title='Unabort' context='' description='Unabort all workflows' %}
+{% endblock modal %}
+
+{% block content %}
+<div class="row">
+  <table cellpadding="0" cellspacing="0" border="0"
+       class="table table-striped table-bordered" id="workflows">
+    <thead><tr>
+        <th width="17%">Owner(s)</th>
+        <th width="16.6%">Name</th>
+        <th width="16.6%">Status</th>
+        <th width="16.6%">Last Start</th>
+        <th width="16.6%">Last End</th>
+        <th width="16.6%">Run Time</th>
+    </tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+{% endblock %}

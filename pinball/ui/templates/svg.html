@@ -1,0 +1,28 @@
+<div id="context-menus">
+    <div id="job-context-menu-template">
+        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+            {% if request.GET.instance %}
+            <li><a tabindex="-1" href="#">
+                Go to job
+            </a></li>
+            {% endif %}
+            <li><a tabindex="-1" href="#">
+                Select with dependents
+            </a></li>
+            <li><a tabindex="-1" href="#" data-target="#">
+                Unselect with dependents
+            </a></li>
+        </ul>
+    </div>
+</div>
+<div class="row">
+  <div class="col-sm-6 col-md-offset-6">
+    <div class="dataTables_filter" style="float: right">
+      <label>
+        <div style="display: inline-block">Search:</div>
+        <input class="form-control" id="graph-search-box">
+      </label>
+    </div>
+  </div>
+</div>
+<div id="graph"></div>
