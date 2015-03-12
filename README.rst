@@ -8,7 +8,7 @@ Pinball is a scalable workflow managemer.
     :depth: 1
     :backlinks: none
 
-Design Principle
+Design Principles
 ----------------
 * **Simple**: based on easy to grasp abstractions
 * **Extensible**: component-based approach
@@ -124,9 +124,13 @@ do the following command. ::
 
 After this, you should be able to see your workflows in Pinball UI. They will be scheduled and run according to the specified schedules. 
 
-Detail Design
+Detailed Design
 ------------- 
 Design details are available in `Pinball Architecture Overview <https://github.pinadmin.com/Pinterest/pinball/blob/master/ARCHITECTURE.rst>`_
+
+Inline-style: 
+![alt text](https://github.com/pinterest/pinball/blob/master/workflow.png "Pinball Workflow UI")
+
 
 User Guide
 -----------------
