@@ -13,7 +13,7 @@ Types of Contributions
 Report Bugs
 ~~~~~~~~~~~
 
-Report bugs at https://github.pinadmin.com/pinball/issues.
+Report bugs at https://github.com/pinterest/pinball/issues
 
 If you are reporting a bug, please include:
 
@@ -43,7 +43,7 @@ Submit Feedback
 ~~~~~~~~~~~~~~~
 
 The best way to send feedback is to file an issue at
-https://github.pinadmin.com/data/pinball/issues.
+https://github.com/pinterest/pinball/issues
 
 If you are proposing a feature:
 
@@ -56,10 +56,10 @@ Get Started!
 
 Ready to contribute? Here's how to set up `pinball` for local development.
 
-1. Fork the `pinball_utils` repo on GitHub.
+1. Fork the `pinball` repo on GitHub.
 2. Clone your fork locally::
 
-    $ git clone git@github.pinadmin.com:your_name_here/pinball.git
+    $ git clone https://github.com/pinterest/pinball.git
 
 3. Install your local copy into a virtualenv. Assuming you have
    virtualenvwrapper installed, this is how you set up your fork for local

@@ -2,10 +2,10 @@
 Pinball Administrator Guide
 ===========================
 
-.. _README: https://github.pinadmin.com/Pinterest/pinball/blob/master/README.rst
-.. _here: https://github.pinadmin.com/Pinterest/pinball/blob/master/pinball/config/default.yaml#L7
-.. _setting: https://github.pinadmin.com/Pinterest/pinball/blob/master/pinball/config/default.yaml#L23
-.. _workflow_util: https://github.pinadmin.com/Pinterest/pinball/blob/master/pinball/tools/workflow_util.py
+.. _README: https://github.com/pinterest/pinball/blob/master/README.rst
+.. _here: https://github.com/pinterest/pinball/blob/master/pinball/config/default.yaml#L7
+.. _setting: https://github.com/pinterest/pinball/blob/master/pinball/config/default.yaml#L23
+.. _workflow_util: https://github.com/pinterest/pinball/blob/master/pinball/tools/workflow_util.py
 
 Please refer README_ to check the installation and quick start. Here, we emphasize how to do Pinball operations.
 
