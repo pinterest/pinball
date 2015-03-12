@@ -128,10 +128,6 @@ Detailed Design
 ------------- 
 Design details are available in `Pinball Architecture Overview <https://github.pinadmin.com/Pinterest/pinball/blob/master/ARCHITECTURE.rst>`_
 
-Inline-style: 
-![alt text](https://github.com/pinterest/pinball/blob/master/workflow.png "Pinball Workflow UI")
-
-
 User Guide
 -----------------
 Detail user guide is available in `Pinball User Guide <https://github.pinadmin.com/Pinterest/pinball/blob/master/USER_GUIDE.rst>`_
