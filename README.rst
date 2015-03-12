@@ -61,7 +61,7 @@ Configure Pinball
 ~~~~~~~~~~~~~~~~~
 In order to start Pinball, user needs to provide a pinball configuration file. A sample pinball configuraiton can be retrived at here_.
 
-.. _here: https://github.pinadmin.com/Pinterest/pinball/blob/master/pinball/config/default.yaml
+.. _here: https://github.com/pinterest/pinball/blob/master/pinball/config/default.yaml
 
 There are a few parameters to configure. For example:
 
@@ -88,8 +88,8 @@ There are a few parameters to configure. For example:
    ui_host:                  pinball
    ui_port:                  8080
 
-.. _example: https://github.pinadmin.com/Pinterest/pinball/blob/master/pinball_ext/examples/workflows.py
-.. _parser: https://github.pinadmin.com/Pinterest/pinball/blob/master/pinball_ext/workflow/parser.py
+.. _example: https://github.com/pinterest/pinball/blob/master/pinball_ext/examples/workflows.py
+.. _parser: https://github.com/pinterest/pinball/blob/master/pinball_ext/workflow/parser.py
 * Application Configuration ::
 
     parser:                    pinball_ext.workflows.parser.PyWorkflowParser
@@ -126,15 +126,15 @@ After this, you should be able to see your workflows in Pinball UI. They will be
 
 Detailed Design
 ------------- 
-Design details are available in `Pinball Architecture Overview <https://github.pinadmin.com/Pinterest/pinball/blob/master/ARCHITECTURE.rst>`_
+Design details are available in `Pinball Architecture Overview <https://github.com/pinterest/pinball/blob/master/ARCHITECTURE.rst>`_
 
 User Guide
 -----------------
-Detail user guide is available in `Pinball User Guide <https://github.pinadmin.com/Pinterest/pinball/blob/master/USER_GUIDE.rst>`_
+Detail user guide is available in `Pinball User Guide <https://github.com/pinterest/pinball/blob/master/USER_GUIDE.rst>`_
 
 Admin Guide
 ------------------
-Administrator guide is available in `Pinball Administrator Guide <https://github.pinadmin.com/Pinterest/pinball/blob/master/ADMIN_GUIDE.rst>`_
+Administrator guide is available in `Pinball Administrator Guide <https://github.com/pinterest/pinball/blob/master/ADMIN_GUIDE.rst>`_
 
 License
 -------
