@@ -1,7 +1,7 @@
 ============
 Pinball
 ============
-Pinball is a scalable workflow managemer.
+Pinball is a scalable workflow manager.
 
 .. contents::
     :local:
