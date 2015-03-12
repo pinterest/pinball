@@ -28,6 +28,7 @@ If you haven't already installed *libmysqlclient-dev*, *graphviz*. Please instal
 
 If you want to install *Pinball* through pypi package, please do ::
 
+  $ sudo pip install --allow-unverified pydot pydot==1.0.28
   $ sudo pip install pinball
 
 Pinball uses mysql as persistent storage. Please also make sure mysql is available, and properly configured.
