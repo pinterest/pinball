@@ -1,0 +1,13 @@
+Modifications on external libraries
+
+backbone/backbone-forms.js:
+validators.requiredEither
+
+backbone/list.js:
+list.template
+
+backbone/editors.bootstrap.js:
+Custom editor library for backbone-forms
+
+bootstrap3/dataTables.bootstrap.js:
+Datatable initialization layout

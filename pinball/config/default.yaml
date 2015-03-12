@@ -1,0 +1,100 @@
+###
+# Default configuration for pinball environment
+###
+
+# Generation should be incremented with each change affecting any of the
+# pinball servers (master, workers, etc.)
+generation:                                 1
+
+# Debug should be disabled for long running Django apps to prevent caching
+# of queries leading to ever growing memory consumption.
+debug:                                      True
+
+# Master and client configuration.
+# master_host:                              default_value = socket.gethostname()
+master_port:                                9090
+# master_name is the suffix of all the pinball db tables.
+# master_name:                              default_value is socket.gethostname()
+client_connect_attempts:                    10
+client_timeout_sec:                         180
+max_backoff_client_reconnet_sec:            1200
+
+# Worker configuration.
+workers:                                    5
+worker_poll_time_sec:                       10
+worker_creation_sleep_interval_sec:         600
+
+# The UI_HOST is a VPN-friendly link for use to link Pinball logs in email.
+# ui_host:                                  default_value = localhost
+ui_port:                                    8080
+allowed_hosts:                              ['*']
+
+# Maximum number of running instances allowed for a workflow
+default_max_workflow_running_instances:     3
+
+# Location to store pinball logs. e.g., job1's log will be stored in
+# the path of /tmp/pinball_job_logs/job1/ given the current settings.
+# local_logs_dir_prefix:                    default_value = /tmp/
+# job_log_path_prefix:                      decault_value = pinball_job_logs/
+
+
+# If enable the feature of store pinball logs in s3, then set
+# the followings.
+# s3_logs_dir_prefix:
+
+# Credentials for aws (e.g, s3) access.
+# aws_access_key_id:
+# aws_secret_access_key:
+
+databases:
+      default:
+            ENGINE:       django.db.backends.mysql
+            NAME:         pinball
+            USER:         flipper
+            PASSWORD:     flipper123
+            HOST:         127.0.0.1
+            PORT:         "3306"
+      pinball.persistence:
+            ENGINE:       django.db.backends.mysql
+            NAME:         pinball
+            USER:         flipper
+            PASSWORD:     flipper123
+            HOST:         127.0.0.1
+            PORT:         "3306"
+
+# Application level configuration.
+# PyWorkflowParser is used by default if no parser is specified.
+parser:                       pinball_ext.workflow.parser.PyWorkflowParser
+parser_params:
+      # Name of the variable that stores workflows config.
+      workflows_config:       pinball_ext.examples.workflows.WORKFLOWS
+      # Root dir of the repo that stores all user defined jobs.
+      job_repo_dir:           "~"
+      # Name of the variable that stores list of dirs where job class should
+      # be imported from. Dirs are relative to 'job_repo_dir'.
+      job_import_dirs_config: pinball_ext.examples.jobs.JOB_IMPORT_DIRS
+
+
+# Configuration for the default email in pinball.
+# We use it as default sender of email service right now.
+default_email:                              your@email.com
+
+# Configuration for self-serving ETL creation through Pinball.
+# github_server:
+# github_api_uri:
+# github_oauth_token:
+# user:
+# github_http_timeout_sec:
+
+# Authentication configuration. If authentication_domains
+# list is empty, then no authentication.
+authentication_domains:                     []
+# google_client_id:
+# google_client_secret:
+
+# Secret key must be set in Django >= 1.5.
+# This is used for authentication
+# secret_key:
+# aes_cbc_key:
+# hmac_key:
+# crypto_version:

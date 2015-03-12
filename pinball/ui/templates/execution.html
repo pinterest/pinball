@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block page_title %}
+Pinball - Execution
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript" charset="utf-8">
+  init = function() {
+    baseInit();
+    var exitCode = $("#exit_code").html();
+    if (exitCode === "") {
+      // Remove the redo action from the drop-down menu.
+      $("a[href='#modal-redo']").remove();
+    }
+    if (exitCode === "0") {
+      $("#exit_code").addClass("text-success");
+    } else {
+      $("#exit_code").addClass("text-danger");
+    }
+    var runTime = $("#run_time").html();
+    if (runTime !== "") {
+      runTime = jintervals(runTime, "{D}d {h}h {m}m {s}s");
+      $("#run_time").html(runTime);
+    }
+  };
+</script>
+{% endblock %}
+
+{% block schedules_active %}
+class="active"
+{% endblock %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb">
+  <li></li>
+  <li>
+    <a href="/instances/?workflow={{ request.GET.workflow }}"> {{ request.GET.workflow }} </a>
+  </li>
+  <li>
+    <a href="/jobs/?workflow={{ request.GET.workflow }}&instance={{ request.GET.instance }}"> {{ request.GET.instance }} </a>
+  </li>
+  <li>
+    <a href="/executions/?workflow={{ request.GET.workflow }}&instance={{ request.GET.instance }}&job={{ request.GET.job }}"> {{ request.GET.job }} </a>
+  </li>
+  <li class="active">
+    {{ request.GET.execution }}
+  </li>
+  <li class="dropdown pull-right">
+    <a class="dropdown-toggle" data-toggle="dropdown" href="#"> Action<span class="caret"></span> </a>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+      <li>
+        <a tabindex="-1" href="#modal-redo" data-toggle="modal">Redo</a>
+      </li>
+    </ul>
+  </li>
+</ol>
+{% endblock breadcrumb %}
+
+{% block modal %}
+{% include 'modal.html' with modal_id='modal-redo' command='redo' title='Redo' context='&workflow='|add:request.GET.workflow|add:'&instance='|add:request.GET.instance|add:'&jobs='|add:request.GET.job|add:'&execution='|add:request.GET.execution description='Redo <b>'|add:request.GET.workflow|add:'</b> instance <b>'|add:request.GET.instance|add:'</b> job <b>'|add:request.GET.job|add:'</b> execution <b>'|add:request.GET.execution|add:'</b>'|safe %}
+{% endblock modal %}
+
+{% block content %}
+<div class="row">
+  <table class="table table-hover table-bordered">
+    <tbody>
+      <tr>
+        <td width="15%">Workflow</td><td>{{ request.GET.workflow }}</td>
+      </tr>
+      <tr>
+        <td width="15%">Instance</td><td>{{ request.GET.instance }}</td>
+      </tr>
+      <tr>
+        <td width="15%">Job</td><td>{{ request.GET.job }}</td>
+      </tr>
+      <tr>
+        <td width="15%">Execution</td><td>{{ request.GET.execution }}</td>
+      </tr>
+      <tr>
+        <td width="15%">Info</td><td>{{ info }}</td>
+      </tr>
+      <tr>
+        <td width="15%">Properties</td><td>{{ properties }}</td>
+      </tr>
+      <tr>
+        <td width="15%">Exit Code</td>
+        <td id="exit_code">{{ exit_code }}</td>
+      </tr>
+      <tr>
+        <td width="15%">Start Time</td><td>{{ start_time }}</td>
+      </tr>
+      <tr>
+        <td width="15%">End Time</td><td>{{ end_time }}</td>
+      </tr>
+      <tr>
+        <td width="15%">Run Time</td><td id="run_time">{{ run_time }}</td>
+      </tr>
+      <tr>
+        <td width="15%">Logs</td>
+        <td>
+        <ul class="inline">
+          {% for log in logs %}
+          <li>
+            <a
+            href="/file/?workflow={{ request.GET.workflow }}&instance={{ request.GET.instance }}&job={{ request.GET.job }}&execution={{ request.GET.execution }}&log_type={{ log }}"> <i class="icon-file"></i>{{ log }} </a>
+          </li>
+          {% endfor %}
+        </ul></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+{% endblock %}

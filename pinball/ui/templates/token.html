@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block body_class %}{{ block.super }}{% endblock %}
+
+{% block page_title %}
+Pinball - Tokens
+{% endblock %}
+
+{% block tokens_active %}
+class="active"
+{% endblock %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb">
+  <li></li>
+  {% for parent, prefix in parents %}
+  <li>
+      <a href="/token_paths/?path={{ prefix|urlencode:'' }}">{{ parent }}</a>
+  </li>
+  {% endfor %}
+  <li class="active">{{ basename }}</li>
+</ol>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="row">
+  <table class="table table-hover table-bordered">
+    <tbody>
+      <tr><td width='15%'>Name</td><td>{{ name }}</td></tr>
+      <tr><td>Version</td><td>{{ version }}</td></tr>
+      <tr><td>Owner</td><td>{{ owner }}</td></tr>
+      <tr><td>Expiration time</td><td>{{ expiration_time }}</td></tr>
+      <tr><td>Priority</td><td>{{ priority }}</td></tr>
+      <tr><td>Data</td><td>{{ data|escape }}</td></tr>
+    </tbody>
+  </table>
+</div>
+{% endblock %}

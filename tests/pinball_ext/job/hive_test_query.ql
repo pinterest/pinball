@@ -1,0 +1,1 @@
+SELECT * FROM unknown_db.unknown_tb WHERE dt >= '%(start_date)s' AND dt <= '%(end_date)s'

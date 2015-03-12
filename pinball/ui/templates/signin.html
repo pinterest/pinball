@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block page_title %}
+Pinball - Signin
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/signin.css" type="text/css" />
+{% endblock %}
+
+{% block content %}
+<div class="center-outer">
+  <div class="center-middle">
+    <div class="row center-inner">
+      <form class="form-signin" action="/signin/" id="signin-form" method="post">
+        <h2 class="form-signin-heading">Pinball: sign in</h2>
+        {% if messages %}
+        {% for message in messages %}
+        <p class="form-signin-heading text-danger">
+          {{ message }}
+        </p>
+        {% endfor %}
+        {% endif %}
+        {% for domain in domains %}
+        <input class="btn btn-lg btn-primary btn-block signin-button" type="button" value="Sign in with {{ domain }}" id="{{ domain }}">
+        {% endfor %}
+        <input type="hidden" value="" name="signin-domain" id="signin-domain">
+        {% csrf_token %}
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block schedule_config_active %}
+class="active"
+{% endblock %}
