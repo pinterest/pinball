@@ -1,6 +1,10 @@
 ============
 Pinball
 ============
+
+.. image:: https://travis-ci.org/pinterest/pinball.svg
+    :target: https://travis-ci.org/pinterest/pinball
+
 Pinball is a scalable workflow manager.
 
 .. contents::
