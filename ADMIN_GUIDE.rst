@@ -89,7 +89,7 @@ adding more jobs and workflows, a good practice is to **peoridically** run the
 following command to keep update pinball job tokens according to the update-to-date 
 workflow configuration. ::
      
-      python -m pinball.tools.run_pinball -c path/to/pinball/yaml/configuration/file -f rescheudle
+      python -m pinball.tools.run_pinball -c path/to/pinball/yaml/configuration/file -f reschedule
 
 More Tools
 -----------
