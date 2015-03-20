@@ -184,14 +184,14 @@ class JobExecutionData(object):
 
 class WorkflowScheduleData(object):
     def __init__(self, next_run_time, recurrence_seconds, overrun_policy,
-                 overrun_policy_help, workflow, workflows_config, emails,
+                 overrun_policy_help, workflow, parser_params, emails,
                  max_running_instances):
         self.next_run_time = next_run_time
         self.recurrence_seconds = recurrence_seconds
         self.overrun_policy = overrun_policy
         self.overrun_policy_help = overrun_policy_help
         self.workflow = workflow
-        self.workflows_config = workflows_config
+        self.parser_params = parser_params
         self.emails = emails
         self.max_running_instances = max_running_instances
 
@@ -200,6 +200,7 @@ class WorkflowScheduleData(object):
         result['next_run_time'] = timestamp_to_str(self.next_run_time)
         result['overrun_policy'] = OverrunPolicy.to_string(self.overrun_policy)
         result['max_running_instances'] = str(self.max_running_instances)
+        result['parser_params'] = str(self.parser_params)
         return result
 
 
