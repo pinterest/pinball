@@ -888,7 +888,7 @@ class DataBuilder(object):
                         overrun_policy=schedule.overrun_policy,
                         overrun_policy_help=overrun_policy_help,
                         workflow=schedule.workflow,
-                        workflows_config=schedule.workflows_config,
+                        parser_params=schedule.parser_params,
                         emails=schedule.emails,
                         max_running_instances=schedule.max_running_instances)
         return None

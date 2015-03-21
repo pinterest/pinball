@@ -40,13 +40,8 @@ class WorkflowGraph(object):
         self._build()
 
     @staticmethod
-    def from_config(config, workflow):
-        data_jobs = get_workflow_jobs_from_parser(workflow, config)
-        return WorkflowGraph(data_jobs, None)
-
-    @staticmethod
-    def from_parser(workflow, config=None):
-        data_jobs = get_workflow_jobs_from_parser(workflow, config)
+    def from_parser(workflow):
+        data_jobs = get_workflow_jobs_from_parser(workflow)
         return WorkflowGraph(data_jobs, None)
 
     def _build(self):

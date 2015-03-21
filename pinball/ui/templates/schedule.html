@@ -57,7 +57,6 @@ Pinball - Schedule
         makeAjaxCall("/ajax/command/?" + $.param({
                          "command": "poison",
                          "workflow": "{{ request.GET.workflow }}",
-                         "workflows_config": "{{ workflows_config }}",
                          "jobs": roots}),
                      "",
                      commandCallback("#modal-poison"));
@@ -82,8 +81,7 @@ Pinball - Schedule
                 "sLengthMenu": "_MENU_ records per page"
             },
             "bProcessing": true,
-            "sAjaxSource": "/ajax/jobs_from_config/?workflows_config=" +
-                           "{{ workflows_config }}&workflow=" +
+            "sAjaxSource": "/ajax/jobs_from_config/?workflow=" +
                            "{{ request.GET.workflow }}",
             "fnCreatedRow": addJobLinks,
             "aoColumns": [
@@ -129,7 +127,7 @@ class="active"
 
 {% block modal %}
 {% include 'modal.html' with modal_id='modal-unschedule' command='unschedule' title='Unschedule' context='&workflow='|add:request.GET.workflow description='Remove workflow <b>'|add:request.GET.workflow|add:'</b> from schedule'|safe %}
-{% include 'modal.html' with modal_id='modal-start' command='start' title='Start' context='&workflow='|add:request.GET.workflow|add:'&workflows_config='|add:workflows_config description='Start a new instance of workflow <b>'|add:request.GET.workflow|add:'</b>'|safe %}
+{% include 'modal.html' with modal_id='modal-start' command='start' title='Start' context='&workflow='|add:request.GET.workflow description='Start a new instance of workflow <b>'|add:request.GET.workflow|add:'</b>'|safe %}
 {% include 'modal.html' with modal_id='modal-poison' title='Poison' onclick='poison()' description='Poison workflow <b>'|add:request.GET.workflow|add:'</b> roots <b><span id="poison-jobs"></span></b>'|safe %}
 {% endblock modal %}
 
@@ -154,7 +152,6 @@ class="active"
               </abbr>
           </td>
       </tr>
-      <tr><td>Workflows config</td><td>{{ workflows_config }}</td></tr>
       <tr><td>Notification email(s)</td><td>{{ emails }}</td></tr>
     </tbody>
   </table>
