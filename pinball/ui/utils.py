@@ -22,19 +22,15 @@ from pinball.workflow.name import Name
 from pinball.workflow.utils import load_path
 
 
-__author__ = 'Pawel Garbacki'
+__author__ = 'Pawel Garbacki, Mao Ye'
 __copyright__ = 'Copyright 2015, Pinterest, Inc.'
 __credits__ = [__author__]
 __license__ = 'Apache'
 __version__ = '2.0'
 
 
-def get_workflow_jobs_from_parser(workflow, workflows_config=None):
-    parser_params = PinballConfig.PARSER_PARAMS.copy()
-    if workflows_config:
-        parser_params['workflows_config'] = workflows_config
-    config_parser = load_path(PinballConfig.PARSER)(parser_params)
-
+def get_workflow_jobs_from_parser(workflow):
+    config_parser = load_path(PinballConfig.PARSER)(PinballConfig.PARSER_PARAMS)
     tokens = config_parser.get_workflow_tokens(workflow)
     jobs_data = []
     for token in tokens:

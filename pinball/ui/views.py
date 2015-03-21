@@ -113,12 +113,7 @@ def graph(request):
                                                       instance=instance)
             workflow_graph = WorkflowGraph(jobs_data, instance_data)
         else:
-            schedule_data = data_builder.get_schedule(workflow)
-            workflows_config = None
-            if schedule_data:
-                workflows_config = schedule_data.workflows_config
-            workflow_graph = WorkflowGraph.from_parser(workflow,
-                                                       workflows_config)
+            workflow_graph = WorkflowGraph.from_parser(workflow)
     except:
         LOG.exception('')
         return HttpResponseServerError(traceback.format_exc())
@@ -224,9 +219,8 @@ class ScheduleView(TemplateView):
 
 def jobs_from_config(request):
     try:
-        workflows_config = request.GET['workflows_config']
         workflow = request.GET['workflow']
-        jobs_data = get_workflow_jobs_from_parser(workflow, workflows_config)
+        jobs_data = get_workflow_jobs_from_parser(workflow)
         jobs_json = _serialize(jobs_data)
     except:
         LOG.exception('')
