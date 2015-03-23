@@ -148,6 +148,18 @@ License
 -------
 Pinball is distributed under `Apache License, Version 2.0 <http://www.apache.org/licenses/LICENSE-2.0.html>`_.
 
+Maintainers
+----------
+* `Pawel Garbacki <https://github.com/pgarbacki>`_
+* `Mao Ye <https://github.com/MaoYe>`_
+* `Changshu Liu <https://github.com/csliu>`_
+
+Contributing
+-----------
+* `Contributors <https://github.com/pinterest/pinball/blob/master/AUTHORS.rst>`_
+* `How to contribute <https://github.com/pinterest/pinball/blob/master/CONTRIBUTING.rst>`_
+
+
 Help
 -----
 If you have any questions or comments, you can reach us at `pinball-users@googlegroups.com <https://groups.google.com/forum/#!forum/pinball-users>`_.
