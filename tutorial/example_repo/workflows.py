@@ -46,5 +46,26 @@ WORKFLOWS = {
         schedule=ScheduleConfig(recurrence=timedelta(days=1),
                                 reference_timestamp=datetime(
                                 year=2015, month=2, day=1, second=1)),
-        notify_emails='your@email.com')
+        notify_emails='your@email.com'),
+
+    # Pinball allows an upstream job to pass attributes to downstream dependants.
+    # Pinball executor has the ability to interpret specially formatted job output.
+    # E.g., printing PINBALL:EVENT_ATTR:akey=avalue to the job output will embed a
+    # akey-avalue pair in the job output event. Output events traverse along job
+    # output edges and they are accessible by downstream jobs. Event attributes are
+    # used to customize the job command line. E.g., command “echo %(akey)s” will be
+    # translated to “echo avalue” by the job executor.
+    'pass_params_between_jobs': WorkflowConfig(
+        jobs={
+            'cmd_parent': JobConfig(CommandJobTemplate('ExamplePinballMagicCMD',
+                                                       'echo PINBALL:EVENT_ATTR:a_cmd_key=a_cmd_value'), []),
+            'python_parent': JobConfig(JobTemplate('ExamplePinballMagicPythonJob'), []),
+            'child': JobConfig(CommandJobTemplate('CHILD', 'echo "child: %%(a_cmd_key)s %%(a_python_key)s"'),
+                               ['cmd_parent', 'python_parent']),
+        },
+        final_job_config=JobConfig(FINAL_JOB),
+        schedule=ScheduleConfig(recurrence=timedelta(days=1),
+                                reference_timestamp=datetime(
+                                year=2015, month=1, day=1, second=1)),
+        notify_emails='your@email.com'),
 }
