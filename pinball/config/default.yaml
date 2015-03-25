@@ -98,3 +98,10 @@ authentication_domains:                     []
 # aes_cbc_key:
 # hmac_key:
 # crypto_version:
+
+# SMTP Settings
+# smtp_host:    default_value = localhost
+# smtp_port:    default_value = 25, change to 465 if smtp_ssl is True 
+# smtp_user:    default_value = ''
+# smtp_pass:    default_value = ''
+# smtp_ssl:     default_value = False
