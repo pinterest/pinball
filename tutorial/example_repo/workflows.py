@@ -53,8 +53,8 @@ WORKFLOWS = {
     # E.g., printing PINBALL:EVENT_ATTR:akey=avalue to the job output will embed a
     # akey-avalue pair in the job output event. Output events traverse along job
     # output edges and they are accessible by downstream jobs. Event attributes are
-    # used to customize the job command line. E.g., command “echo %(akey)s” will be
-    # translated to “echo avalue” by the job executor.
+    # used to customize the job command line. E.g., command "echo %(akey)s" will be
+    # translated to "echo avalue" by the job executor.
     'pass_params_between_jobs': WorkflowConfig(
         jobs={
             'cmd_parent': JobConfig(CommandJobTemplate('ExamplePinballMagicCMD',
