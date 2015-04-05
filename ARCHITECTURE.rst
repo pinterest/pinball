@@ -116,7 +116,7 @@ Worker is a client of the master. It does the following: ::
     }
   }
 
-Other Componenets
+Other Components
 -----------------
 Workflow configuration
 ~~~~~~~~~~~~~~~~~~~~~~~
