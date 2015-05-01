@@ -183,7 +183,7 @@ def main():
         master_name(PinballConfig.MASTER_NAME)
     _pinball_imports()
     if PinballConfig.UI_HOST:
-        emailer = Emailer(PinballConfig.UI_HOST, 80)
+        emailer = Emailer(PinballConfig.UI_HOST, PinballConfig.UI_PORT)
     else:
         emailer = Emailer(socket.gethostname(), PinballConfig.UI_PORT)
 
@@ -211,7 +211,7 @@ def main():
     else:
         assert options.mode == 'workers'
         if PinballConfig.UI_HOST:
-            emailer = Emailer(PinballConfig.UI_HOST, 80)
+            emailer = Emailer(PinballConfig.UI_HOST, PinballConfig.UI_PORT)
         else:
             emailer = Emailer(socket.gethostname(), PinballConfig.UI_PORT)
         threads = _create_workers(PinballConfig.WORKERS, factory, emailer)

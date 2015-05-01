@@ -169,6 +169,13 @@ class PinballConfig(object):
 
     ALLOWED_HOSTS = ['*']
 
+    # SMTP Configuration
+    SMTP_HOST = 'localhost'
+    SMTP_PORT = 25
+    SMTP_USER = ''
+    SMTP_PASS = ''
+    SMTP_SSL  = False
+
     @staticmethod
     def parse(config_file):
         # Assume the config file is "yaml" file

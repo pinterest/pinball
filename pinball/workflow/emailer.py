@@ -64,8 +64,16 @@ class Emailer(object):
         if html_part:
             msg.attach(html_part)
 
-        # Send the message via local SMTP server.
-        smtp = smtplib.SMTP('localhost')
+        # Send the message via configurable SMTP server.
+        if PinballConfig.SMTP_SSL:
+            smtp = smtplib.SMTP_SSL(PinballConfig.SMTP_HOST, PinballConfig.SMTP_PORT)
+        else:
+            smtp = smtplib.SMTP(PinballConfig.SMTP_HOST, PinballConfig.SMTP_PORT)
+
+        # Authorization: Login/Password
+        if PinballConfig.SMTP_USER:
+            smtp.login(PinballConfig.SMTP_USER, PinballConfig.SMTP_PASS)
+
         smtp.sendmail(msg['From'], to, msg.as_string())
         smtp.quit()
         LOG.info('Sent email to %s with subject "%s"', msg['To'], subject)
