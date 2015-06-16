@@ -26,6 +26,7 @@ import time
 from pinball.common.s3_utils import delete_s3_directory
 from pinball.config.pinball_config import PinballConfig
 from pinball.config.utils import get_unique_name
+from pinball.config.utils import master_name
 from pinball.master.factory import Factory
 from pinball.master.thrift_lib.ttypes import GroupRequest
 from pinball.master.thrift_lib.ttypes import ModifyRequest
@@ -1264,6 +1265,9 @@ def main():
     options = parser.parse_args(sys.argv[1:])
 
     PinballConfig.parse(options.config_file)
+
+    if hasattr(PinballConfig, 'MASTER_NAME') and PinballConfig.MASTER_NAME:
+        master_name(PinballConfig.MASTER_NAME)
 
     print run_command(options)
 
