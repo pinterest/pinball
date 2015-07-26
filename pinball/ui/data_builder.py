@@ -383,6 +383,7 @@ class DataBuilder(object):
             Workflow data defined by input instances.
         """
         assert instances
+        status = Status.RUNNING
         start_time = 0
         end_time = 0
         last_instance = None
@@ -395,11 +396,17 @@ class DataBuilder(object):
                 if instance.start_time > start_time:
                     start_time = instance.start_time
                     last_instance = instance.instance
-            elif end_time is not None and instance.end_time > end_time:
-                start_time = instance.start_time
-                end_time = instance.end_time
-                status = instance.status
-                last_instance = instance.instance
+            elif end_time is not None:
+                if instance.end_time == sys.maxint:
+                    start_time = instance.start_time
+                    status = instance.status
+                    last_instance = instance.instance
+                elif instance.end_time > end_time:
+                    start_time = instance.start_time
+                    end_time = instance.end_time
+                    status = instance.status
+                    last_instance = instance.instance
+
         return WorkflowData(instances[0].workflow,
                             status,
                             start_time,
