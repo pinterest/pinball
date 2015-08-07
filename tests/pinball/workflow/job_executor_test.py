@@ -162,9 +162,6 @@ class ShellJobExecutorTestCase(unittest.TestCase):
             any_order=True)
         self.assertEqual(file_mock.write.call_count, 5)
 
-        exists_mock.assert_called_once_with(
-            '/tmp/pinball_job_logs/some_workflow/123')
-
         self.assertEqual(1, len(self._executor.job.history))
         execution_record = self._executor.job.history[0]
         self.assertEqual(0, execution_record.exit_code)
@@ -217,9 +214,6 @@ class ShellJobExecutorTestCase(unittest.TestCase):
 
         file_mock.write.assert_has_calls(
             [mock.call('a' * 16384), mock.call('a' * 3616)])
-
-        exists_mock.assert_called_once_with(
-            '/tmp/pinball_job_logs/some_workflow/123')
 
         self.assertEqual(1, len(executor.job.history))
         execution_record = executor.job.history[0]

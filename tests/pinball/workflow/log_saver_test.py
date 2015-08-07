@@ -38,7 +38,8 @@ class FileLogSaverTestCase(unittest.TestCase):
 
 class S3FileLogSaverTestCase(unittest.TestCase):
     def setUp(self):
-        self._s3_path = 's3n://bucket_name/rest_file_path'
+        PinballConfig.S3_LOGS_DIR_PREFIX = 's3n://bucket_name/'
+        self._s3_path = 's3n://bucket_name/pinball_job_logs/rest_file_path'
         self._log_saver = log_saver.FileLogSaver.from_path(self._s3_path)
 
     def test_from_path(self):
