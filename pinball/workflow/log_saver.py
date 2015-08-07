@@ -151,10 +151,9 @@ class S3FileLogSaver(FileLogSaver):
 
     def __init__(self, file_path):
         super(S3FileLogSaver, self).__init__(file_path)
-        bucket_name, rest_file_path = s3_utils.parse_s3_location(self._file_path)
-        local_file_path = \
-            os.path.join(PinballConfig.LOCAL_LOGS_DIR,
-                         rest_file_path.replace(PinballConfig.JOB_LOG_PATH_PREFIX, ''))
+        local_file_path = self._file_path.replace(
+            PinballConfig.S3_LOGS_DIR_PREFIX,
+            PinballConfig.LOCAL_LOGS_DIR_PREFIX)
         self._local_file_log_saver = FileLogSaver(local_file_path)
         self._last_remote_upload_time = time.time()
         self._pending_bytes = 0L
@@ -179,6 +178,14 @@ class S3FileLogSaver(FileLogSaver):
         """
         self._sync_to_s3()
         self._s3_key = None
+
+        LOG.info("deleting local file: %s as all content is uploaded.",
+                 self._local_file_log_saver._file_path)
+        if os.path.exists(self._local_file_log_saver._file_path):
+            try:
+                os.remove(self._local_file_log_saver._file_path)
+            except OSError, e:
+                LOG.warn('deletion failed due to: %s', e)
 
     def _check_s3_upload_condition(self):
         """Check whether to upload local log file to remote s3 storage.
@@ -227,7 +234,9 @@ class S3FileLogSaver(FileLogSaver):
         content = self._local_file_log_saver.read()
         self._local_file_log_saver.close()
         self._s3_key.set_contents_from_string(content)
-        LOG.info("%s bytes of data has been uploaded to s3 path %s" % (str(len(content)), self._file_path))
+        LOG.info("%d bytes of data has been uploaded to s3 path %s",
+                 len(content),
+                 self._file_path)
 
     def _write_to_local_file(self, content_str):
         """Write content_str to a local file."""
