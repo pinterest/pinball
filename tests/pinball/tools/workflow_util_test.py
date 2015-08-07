@@ -80,7 +80,7 @@ def _cmp_job_tokens(test, job_token1, job_token2):
 
 
 class StartTestCase(unittest.TestCase):
-    @mock.patch('pinball.tools.workflow_util.load_path')
+    @mock.patch('pinball.parser.utils.load_path')
     @mock.patch('pinball.tools.workflow_util._check_workflow_instances')
     def test_start_non_existent(self, check_workflow_instances_mock, load_path_mock):
         Options = collections.namedtuple('args', 'workflow')
@@ -92,7 +92,7 @@ class StartTestCase(unittest.TestCase):
         config_parser = mock.Mock()
 
         def load_path(params):
-            self.assertEqual(['key'], params.keys())
+            self.assertEqual(['caller', 'key'], sorted(params.keys()))
             return config_parser
         load_path_mock.return_value = load_path
         config_parser.get_workflow_tokens.return_value = None
@@ -103,7 +103,7 @@ class StartTestCase(unittest.TestCase):
         self.assertEqual('workflow does_not_exist not found in %s\n' %
                          str(PinballConfig.PARSER_PARAMS), output)
 
-    @mock.patch('pinball.tools.workflow_util.load_path')
+    @mock.patch('pinball.parser.utils.load_path')
     @mock.patch('pinball.tools.workflow_util._check_workflow_instances')
     def test_start_workflow(self, check_workflow_instance_mock, load_path_mock):
         Options = collections.namedtuple('args', 'workflow')
@@ -115,7 +115,7 @@ class StartTestCase(unittest.TestCase):
         config_parser = mock.Mock()
 
         def load_path(params):
-            self.assertEqual(['key'], params.keys())
+            self.assertEqual(['caller', 'key'], sorted(params.keys()))
             return config_parser
         load_path_mock.return_value = load_path
         job_token = Token(
@@ -833,7 +833,7 @@ class UnExitTestCase(ModifySignalTestCase):
 
 
 class ReScheduleTestCase(unittest.TestCase):
-    @mock.patch('pinball.tools.workflow_util.load_path')
+    @mock.patch('pinball.parser.utils.load_path')
     def test_reschdule_non_existent(self, load_path_mock):
         Options = collections.namedtuple('args',
                                          'workflow,force')
@@ -845,7 +845,7 @@ class ReScheduleTestCase(unittest.TestCase):
         config_parser = mock.Mock()
 
         def load_path(params):
-            self.assertEqual(['key'], params.keys())
+            self.assertEqual(['caller', 'key'], sorted(params.keys()))
             return config_parser
         load_path_mock.return_value = load_path
         config_parser.get_workflow_names.return_value = []
@@ -855,7 +855,7 @@ class ReScheduleTestCase(unittest.TestCase):
 
         self.assertEqual('workflow does_not_exist not found\n', output)
 
-    @mock.patch('pinball.tools.workflow_util.load_path')
+    @mock.patch('pinball.parser.utils.load_path')
     def test_reschedule_workflow(self, load_path_mock):
         Options = collections.namedtuple('args',
                                          'workflow,force')
@@ -867,7 +867,7 @@ class ReScheduleTestCase(unittest.TestCase):
         config_parser = mock.Mock()
 
         def load_path(params):
-            self.assertEqual(['key'], params.keys())
+            self.assertEqual(['caller', 'key'], sorted(params.keys()))
             return config_parser
         load_path_mock.return_value = load_path
         config_parser.get_workflow_names.return_value = ['some_workflow']
@@ -900,7 +900,7 @@ class ReScheduleTestCase(unittest.TestCase):
                          "schedule tokens are "
                          "['/schedule/workflow/some_workflow']\n", output)
 
-    @mock.patch('pinball.tools.workflow_util.load_path')
+    @mock.patch('pinball.parser.utils.load_path')
     def test_reschedule_workflows(self, load_path_mock):
         Options = collections.namedtuple('args',
                                          'workflow, force')
@@ -912,7 +912,7 @@ class ReScheduleTestCase(unittest.TestCase):
         config_parser = mock.Mock()
 
         def load_path(params):
-            self.assertEqual(['key'], params.keys())
+            self.assertEqual(['caller', 'key'], sorted(params.keys()))
             return config_parser
         load_path_mock.return_value = load_path
 
@@ -1049,7 +1049,7 @@ class ReloadTestCase(unittest.TestCase):
 
         PinballConfig.PARSER_PARAMS = {'key': 'value'}
 
-    @mock.patch('pinball.tools.workflow_util.load_path')
+    @mock.patch('pinball.parser.utils.load_path')
     def test_reload_non_existent(self, load_path_mock):
         Options = collections.namedtuple(
             'args', 'workflow, instance, jobs, force')
@@ -1064,7 +1064,7 @@ class ReloadTestCase(unittest.TestCase):
         config_parser = mock.Mock()
 
         def load_path(params):
-            self.assertEqual(['key'], params.keys())
+            self.assertEqual(['caller', 'key'], sorted(params.keys()))
             return config_parser
         load_path_mock.return_value = load_path
         config_parser.get_workflow_names.return_value = []
@@ -1076,7 +1076,7 @@ class ReloadTestCase(unittest.TestCase):
                          str(PinballConfig.PARSER_PARAMS), output)
 
     @mock.patch('pinball.tools.workflow_util.time')
-    @mock.patch('pinball.tools.workflow_util.load_path')
+    @mock.patch('pinball.parser.utils.load_path')
     def test_reload_owned_job(self, load_path_mock, time):
         Options = collections.namedtuple(
             'args', 'workflow, instance, jobs, force')
@@ -1091,7 +1091,7 @@ class ReloadTestCase(unittest.TestCase):
         config_parser = mock.Mock()
 
         def load_path(params):
-            self.assertEqual(['key'], params.keys())
+            self.assertEqual(['caller', 'key'], sorted(params.keys()))
             return config_parser
         load_path_mock.return_value = load_path
         config_parser.get_workflow_names.return_value = ['some_workflow']
@@ -1145,7 +1145,7 @@ class ReloadTestCase(unittest.TestCase):
         return check_request
 
     @mock.patch('pinball.tools.workflow_util.time')
-    @mock.patch('pinball.tools.workflow_util.load_path')
+    @mock.patch('pinball.parser.utils.load_path')
     def test_reload_not_owned_job(self, load_path_mock, time):
         Options = collections.namedtuple(
             'args', 'workflow, instance, jobs, force')
@@ -1160,7 +1160,7 @@ class ReloadTestCase(unittest.TestCase):
         config_parser = mock.Mock()
 
         def load_path(params):
-            self.assertEqual(['key'], params.keys())
+            self.assertEqual(['caller', 'key'], sorted(params.keys()))
             return config_parser
         load_path_mock.return_value = load_path
         config_parser.get_workflow_names.return_value = ['some_workflow']
@@ -1209,7 +1209,7 @@ class ReloadTestCase(unittest.TestCase):
                          "some_workflow instance 123", output)
 
     @mock.patch('pinball.tools.workflow_util.time')
-    @mock.patch('pinball.tools.workflow_util.load_path')
+    @mock.patch('pinball.parser.utils.load_path')
     def test_reload_all_jobs(self, load_path_mock, time):
         Options = collections.namedtuple(
             'args', 'workflow, instance, jobs, force')
@@ -1224,7 +1224,7 @@ class ReloadTestCase(unittest.TestCase):
         config_parser = mock.Mock()
 
         def load_path(params):
-            self.assertEqual(['key'], params.keys())
+            self.assertEqual(['caller', 'key'], sorted(params.keys()))
             return config_parser
         load_path_mock.return_value = load_path
         config_parser.get_workflow_names.return_value = ['some_workflow']

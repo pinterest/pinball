@@ -29,6 +29,8 @@ from pinball.config.pinball_config import PinballConfig
 from pinball.config.utils import get_log
 from pinball.config.utils import timestamp_to_str
 from pinball.master.thrift_lib.ttypes import ModifyRequest
+from pinball.parser.config_parser import ParserCaller
+from pinball.parser.utils import annotate_parser_caller
 from pinball.persistence.token_data import TokenData
 from pinball.scheduler.overrun_policy import OverrunPolicy
 from pinball.ui.data import Status
@@ -148,7 +150,10 @@ class WorkflowSchedule(Schedule):
             max_running_instances=None):
         Schedule.__init__(self, next_run_time, recurrence_seconds,
                           overrun_policy)
-        self.parser_params = parser_params
+        self.parser_params = annotate_parser_caller(
+            parser_params,
+            ParserCaller.SCHEDULE)
+
         self.workflow = workflow
         self.emails = emails if emails is not None else []
         self.max_running_instances = max_running_instances if max_running_instances \

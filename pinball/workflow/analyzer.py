@@ -24,6 +24,8 @@ from pinball.config.pinball_config import PinballConfig
 from pinball.master.thrift_lib.ttypes import Query
 from pinball.master.thrift_lib.ttypes import QueryRequest
 from pinball.master.thrift_lib.ttypes import Token
+from pinball.parser.config_parser import ParserCaller
+from pinball.parser.utils import load_parser_with_caller
 from pinball.workflow.name import Name
 from pinball.workflow.event import Event
 from pinball.workflow.utils import load_path
@@ -135,7 +137,9 @@ class Analyzer(object):
     def _read_tokens_from_parser_params(self):
         """Read archived job tokens from the PinballConfig.PARSER_PARAMS.
         """
-        config_parser = load_path(PinballConfig.PARSER)(PinballConfig.PARSER_PARAMS)
+        config_parser = load_parser_with_caller(PinballConfig.PARSER,
+                                                PinballConfig.PARSER_PARAMS,
+                                                ParserCaller.ANALYZER)
         tokens = config_parser.get_workflow_tokens(self._workflow)
         self._filter_job_tokens(tokens)
 

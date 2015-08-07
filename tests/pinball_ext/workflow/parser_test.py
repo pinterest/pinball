@@ -134,7 +134,7 @@ class WorkflowDefTestCase(unittest.TestCase):
         self.assertEqual(
             "workflow:some_workflow, schedule:WorkflowSchedule(next_run_time=2013-06-04 "
             "14:00:00 UTC, recurrence=1 day, 0:00:00, overrun_policy=SKIP, "
-            "parser_params={}, "
+            "parser_params={'caller': 'schedule'}, "
             "workflow=some_workflow, email=['some_email'], max_running_instances=3), "
             "notify_emails:some_emails, jobs:{'some_job_3': "
             "job:some_workflow.some_job_3, deps:[], 'some_job_2': "

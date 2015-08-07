@@ -17,6 +17,7 @@ import mock
 import unittest
 
 from pinball.master.thrift_lib.ttypes import Token
+from pinball.parser.config_parser import PARSER_CALLER_KEY
 from pinball.scheduler.overrun_policy import OverrunPolicy
 from pinball.scheduler.schedule import Schedule
 from pinball.scheduler.schedule import WorkflowSchedule
@@ -95,7 +96,7 @@ class WorkflowScheduleTestCase(unittest.TestCase):
         config_parser = mock.Mock()
 
         def load_path(params):
-            self.assertEqual([], params.keys())
+            self.assertEqual([PARSER_CALLER_KEY], params.keys())
             return config_parser
         load_path_mock.return_value = load_path
         name = Name(workflow='some_workflow',
