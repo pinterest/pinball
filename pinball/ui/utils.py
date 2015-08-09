@@ -18,8 +18,9 @@ import pickle
 from pinball.config.pinball_config import PinballConfig
 from pinball.ui.data import JobData
 from pinball.ui.data import Status
+from pinball.parser.config_parser import ParserCaller
+from pinball.parser.utils import load_parser_with_caller
 from pinball.workflow.name import Name
-from pinball.workflow.utils import load_path
 
 
 __author__ = 'Pawel Garbacki, Mao Ye'
@@ -30,7 +31,9 @@ __version__ = '2.0'
 
 
 def get_workflow_jobs_from_parser(workflow):
-    config_parser = load_path(PinballConfig.PARSER)(PinballConfig.PARSER_PARAMS)
+    config_parser = load_parser_with_caller(PinballConfig.PARSER,
+                                            PinballConfig.PARSER_PARAMS,
+                                            ParserCaller.UI)
     tokens = config_parser.get_workflow_tokens(workflow)
     jobs_data = []
     for token in tokens:

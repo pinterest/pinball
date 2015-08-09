@@ -22,6 +22,15 @@ __credits__ = [__author__]
 __license__ = 'Apache'
 __version__ = '2.0'
 
+PARSER_CALLER_KEY = 'caller'
+
+
+class ParserCaller(object):
+    ANALYZER = 'analyzer'
+    SCHEDULE = 'schedule'
+    UI = 'ui'
+    WORKFLOW_UTIL = 'workflow_util'
+
 
 class ConfigParser(object):
     __metaclass__ = abc.ABCMeta

@@ -17,6 +17,9 @@ import calendar
 import datetime
 import pytz
 
+from pinball.parser.config_parser import PARSER_CALLER_KEY
+from pinball.workflow.utils import load_path
+
 
 __author__ = 'Pawel Garbacki'
 __copyright__ = 'Copyright 2015, Pinterest, Inc.'
@@ -76,3 +79,14 @@ def schedule_to_timestamp(execution_time, start_date=None):
                                         pytz.utc)
 
     return int(calendar.timegm(parsed_datetime.timetuple()))
+
+
+def annotate_parser_caller(parser_params, parser_caller):
+    if parser_params:
+        return dict({PARSER_CALLER_KEY: parser_caller}, **parser_params)
+    else:
+        return {PARSER_CALLER_KEY: parser_caller}
+
+
+def load_parser_with_caller(parser_name, parser_params, parser_caller):
+    return load_path(parser_name)(annotate_parser_caller(parser_params, parser_caller))

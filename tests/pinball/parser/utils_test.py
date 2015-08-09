@@ -19,6 +19,9 @@ import mock
 import pytz
 import unittest
 
+from pinball.parser.config_parser import ParserCaller
+from pinball.parser.config_parser import PARSER_CALLER_KEY
+from pinball.parser.utils import annotate_parser_caller
 from pinball.parser.utils import recurrence_str_to_sec
 from pinball.parser.utils import schedule_to_timestamp
 
@@ -55,3 +58,22 @@ class UtilsTestCase(unittest.TestCase):
 
             # 1325462460 = 02 Jan 2012 00:01:00 UTC
             self.assertEqual(1325462460, schedule_to_timestamp('00.00.01.000'))
+
+    def test_annotate_parser_caller(self):
+        org_param = {
+            'key1': 'value1',
+            'key2': 'value2',
+            'key3': 3
+        }
+        new_param = annotate_parser_caller(org_param, ParserCaller.UI)
+
+        self.assertEquals(len(org_param), 3)
+        self.assertNotIn(PARSER_CALLER_KEY, org_param.keys())
+
+        self.assertEquals(len(new_param), 4)
+        self.assertIn(PARSER_CALLER_KEY, new_param.keys())
+
+        org_param1 = None
+        new_param1 = annotate_parser_caller(org_param1, ParserCaller.ANALYZER)
+        self.assertIsNotNone(new_param1)
+        self.assertEquals([PARSER_CALLER_KEY], new_param1.keys())

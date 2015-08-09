@@ -34,6 +34,8 @@ from pinball.master.thrift_lib.ttypes import Query
 from pinball.master.thrift_lib.ttypes import QueryAndOwnRequest
 from pinball.master.thrift_lib.ttypes import QueryRequest
 from pinball.master.thrift_lib.ttypes import Token
+from pinball.parser.config_parser import ParserCaller
+from pinball.parser.utils import load_parser_with_caller
 from pinball.tools.base import Command
 from pinball.tools.base import CommandException
 from pinball.tools.base import confirm
@@ -45,7 +47,6 @@ from pinball.workflow.signaller import Signal
 from pinball.workflow.signaller import Signaller
 from pinball.workflow.utils import get_logs_dir
 from pinball.workflow.utils import get_unique_workflow_instance
-from pinball.workflow.utils import load_path
 
 
 __author__ = 'Pawel Garbacki, Mao Ye'
@@ -91,7 +92,9 @@ class Start(Command):
                                    'workflow %s due to too many instances '
                                    'running!' % self._workflow)
 
-        config_parser = load_path(PinballConfig.PARSER)(PinballConfig.PARSER_PARAMS)
+        config_parser = load_parser_with_caller(PinballConfig.PARSER,
+                                                PinballConfig.PARSER_PARAMS,
+                                                ParserCaller.WORKFLOW_UTIL)
         workflow_tokens = config_parser.get_workflow_tokens(self._workflow)
         if not workflow_tokens:
             return 'workflow %s not found in %s\n' % (
@@ -763,7 +766,9 @@ class ReSchedule(ModifySchedule):
         self._force = options.force
 
     def execute(self, client, store):
-        config_parser = load_path(PinballConfig.PARSER)(PinballConfig.PARSER_PARAMS)
+        config_parser = load_parser_with_caller(PinballConfig.PARSER,
+                                                PinballConfig.PARSER_PARAMS,
+                                                ParserCaller.WORKFLOW_UTIL)
         workflow_names = config_parser.get_workflow_names()
         if (self._workflow and not self._workflow in workflow_names):
             return 'workflow %s not found\n' % self._workflow
@@ -956,7 +961,9 @@ class Reload(Command):
         return True
 
     def execute(self, client, store):
-        config_parser = load_path(PinballConfig.PARSER)(PinballConfig.PARSER_PARAMS)
+        config_parser = load_parser_with_caller(PinballConfig.PARSER,
+                                                PinballConfig.PARSER_PARAMS,
+                                                ParserCaller.WORKFLOW_UTIL)
         workflow_names = config_parser.get_workflow_names()
         if self._workflow not in workflow_names:
             return 'workflow %s not found in %s\n' % (
