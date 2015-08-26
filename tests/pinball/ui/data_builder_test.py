@@ -14,10 +14,12 @@
 
 """Validation tests for data builder."""
 import mock
+import sys
 import unittest
 
 from pinball.config.utils import PinballException
 from pinball.ui.data import Status
+from pinball.ui.data import WorkflowInstanceData
 from pinball.ui.data_builder import DataBuilder
 from pinball.workflow.signaller import Signal
 from tests.pinball.persistence.ephemeral_store import EphemeralStore
@@ -287,3 +289,70 @@ class DataBuilderTestCase(unittest.TestCase):
         self._add_tokens()
         self.assertTrue(self._data_builder.is_signal_set('workflow_0', 0,
                                                          Signal.DRAIN))
+
+    # Workflow status should be the running instance
+    def test_workflow_data_from_instances_data1(self):
+        wf_instance_list = [
+            WorkflowInstanceData('wf', '22346', Status.ABORTED, 12346, 54321),
+            WorkflowInstanceData('wf', '22345', Status.RUNNING, 12345, None),
+            WorkflowInstanceData('wf', '22347', Status.SUCCESS, 12347, 12390),
+            WorkflowInstanceData('wf', '22348', Status.RUNNING, 12348, None),
+        ]
+        wf_data = DataBuilder._workflow_data_from_instances_data(
+            wf_instance_list)
+        self.assertEquals(wf_data.workflow, 'wf')
+        self.assertEquals(wf_data.status, Status.RUNNING)
+        self.assertEquals(wf_data.last_instance, '22348')
+        self.assertEquals(wf_data.last_start_time, 12348)
+        self.assertEquals(wf_data.last_end_time, None)
+        self.assertEquals(wf_data.running_instance_number, 2)
+
+    # Workflow status should be the running instance even if some instance ended
+    # at sys.maxint time
+    def test_workflow_data_from_instances_data2(self):
+        wf_instance_list = [
+            WorkflowInstanceData('wf', '22346', Status.ABORTED, 12355, sys.maxint),
+            WorkflowInstanceData('wf', '22347', Status.SUCCESS, 12365, 12390),
+            WorkflowInstanceData('wf', '22345', Status.RUNNING, 12345, None),
+        ]
+        wf_data = DataBuilder._workflow_data_from_instances_data(
+            wf_instance_list)
+        self.assertEquals(wf_data.workflow, 'wf')
+        self.assertEquals(wf_data.status, Status.RUNNING)
+        self.assertEquals(wf_data.last_instance, '22345')
+        self.assertEquals(wf_data.last_start_time, 12345)
+        self.assertEquals(wf_data.last_end_time, None)
+        self.assertEquals(wf_data.running_instance_number, 1)
+
+    # Workflow status should be the last finished instance
+    def test_workflow_data_from_instances_data3(self):
+        wf_instance_list = [
+            WorkflowInstanceData('wf', '22346', Status.ABORTED, 12345, 12392),
+            WorkflowInstanceData('wf', '22347', Status.SUCCESS, 12346, 12393),
+            WorkflowInstanceData('wf', '22345', Status.FAILURE, 12347, 12391),
+            ]
+        wf_data = DataBuilder._workflow_data_from_instances_data(
+            wf_instance_list)
+        self.assertEquals(wf_data.workflow, 'wf')
+        self.assertEquals(wf_data.status, Status.SUCCESS)
+        self.assertEquals(wf_data.last_instance, '22347')
+        self.assertEquals(wf_data.last_start_time, 12346)
+        self.assertEquals(wf_data.last_end_time, 12393)
+        self.assertEquals(wf_data.running_instance_number, 0)
+
+    # Workflow status should be the last finished instance even if some instance
+    # ended with sys.maxint time
+    def test_workflow_data_from_instances_data4(self):
+        wf_instance_list = [
+            WorkflowInstanceData('wf', '22346', Status.ABORTED, 12345, 12392),
+            WorkflowInstanceData('wf', '22347', Status.SUCCESS, 12346, 12393),
+            WorkflowInstanceData('wf', '22345', Status.FAILURE, 12391, sys.maxint),
+            ]
+        wf_data = DataBuilder._workflow_data_from_instances_data(
+            wf_instance_list)
+        self.assertEquals(wf_data.workflow, 'wf')
+        self.assertEquals(wf_data.status, Status.SUCCESS)
+        self.assertEquals(wf_data.last_instance, '22347')
+        self.assertEquals(wf_data.last_start_time, 12346)
+        self.assertEquals(wf_data.last_end_time, 12393)
+        self.assertEquals(wf_data.running_instance_number, 0)

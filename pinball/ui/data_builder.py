@@ -376,6 +376,11 @@ class DataBuilder(object):
     def _workflow_data_from_instances_data(instances):
         """Extract workflow data from its instances data.
 
+        'last_instance' is defined as:
+            - the one that started most recently if there is running instance
+            - the one that finished most recently if this is no running instance
+        (finish means non-running, could be: success, failed or aborted)
+
         Args:
             instances: Workflow instances to extract workflow data from.
             Instances must belong to the same workflow.
@@ -383,34 +388,40 @@ class DataBuilder(object):
             Workflow data defined by input instances.
         """
         assert instances
-        status = Status.RUNNING
-        start_time = 0
-        end_time = 0
-        last_instance = None
+
         running_instance_number = 0
+        last_instance = None
+        # workflow property (property of last_instance)
+        wf_start_time = 0
+        wf_end_time = 0
+        wf_status = Status.RUNNING
+
         for instance in instances:
+            # handle a running instance
             if not instance.end_time:
-                end_time = None
-                status = Status.RUNNING
+                wf_status = Status.RUNNING
                 running_instance_number += 1
-                if instance.start_time > start_time:
-                    start_time = instance.start_time
+                # the previous last workflow is non-running or it's running but
+                # starts earlier that this instance
+                if wf_end_time or instance.start_time > wf_start_time:
+                    wf_start_time = instance.start_time
                     last_instance = instance.instance
-            elif end_time is not None:
-                if instance.end_time == sys.maxint:
-                    start_time = instance.start_time
-                    status = instance.status
-                    last_instance = instance.instance
-                elif instance.end_time > end_time:
-                    start_time = instance.start_time
-                    end_time = instance.end_time
-                    status = instance.status
+                wf_end_time = None
+            # no running instance is ever found yet
+            elif wf_end_time is not None:
+                # reuse start time if we lost the actual end time
+                this_end_time = instance.start_time \
+                    if instance.end_time == sys.maxint else instance.end_time
+                if this_end_time > wf_end_time:
+                    wf_start_time = instance.start_time
+                    wf_end_time = this_end_time
+                    wf_status = instance.status
                     last_instance = instance.instance
 
         return WorkflowData(instances[0].workflow,
-                            status,
-                            start_time,
-                            end_time,
+                            wf_status,
+                            wf_start_time,
+                            wf_end_time,
                             last_instance,
                             running_instance_number)
 
