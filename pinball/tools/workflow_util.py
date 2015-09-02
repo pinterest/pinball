@@ -786,17 +786,19 @@ class ReSchedule(ModifySchedule):
             for i in range(0, len(workflows)):
                 workflow = workflows[i]
                 new_schedule_token = config_parser.get_schedule_token(workflow)
+                if not new_schedule_token:
+                    continue
+
                 old_schedule_token = old_schedule_tokens[i]
-                old_schedule = None
-                new_schedule = None
+                old_corresponds_new = False
                 if old_schedule_token:
                     assert old_schedule_token.name == new_schedule_token.name
                     new_schedule_token.version = old_schedule_token.version
                     old_schedule = pickle.loads(old_schedule_token.data)
                     new_schedule = pickle.loads(new_schedule_token.data)
-                if (not old_schedule or
-                        (old_schedule and  # new_schedule and
-                         not old_schedule.corresponds_to(new_schedule))):
+                    old_corresponds_new = old_schedule.corresponds_to(new_schedule)
+
+                if not old_schedule_token or not old_corresponds_new:
                     request.updates.append(new_schedule_token)
                     schedule_token_names.append(new_schedule_token.name)
                     rescheduled_workflows.append(workflow)
