@@ -221,7 +221,7 @@ class PauseTestCase(unittest.TestCase):
         query = Query(namePrefix='/workflow/some_workflow/123/')
         query_request = QueryRequest(queries=[query])
         client.query.assert_called_once_with(query_request)
-        client.modify.assert_called_once()
+        self.assertEqual(1, client.modify.call_count)
         modify_request = client.modify.call_args[0][0]
         self.assertEqual(1, len(modify_request.updates))
         owned_token = modify_request.updates[0]
@@ -643,8 +643,8 @@ class PoisonTestCase(unittest.TestCase):
                                        deletes=[self._signal_token])
         client.modify.assert_called_once_with(modify_request)
 
-        analyzer.get_tokens.assert_called_once()
-        analyzer.get_new_event_tokens.assert_called_once()
+        self.assertEqual(1, analyzer.get_tokens.call_count)
+        self.assertEqual(1, analyzer.get_new_event_tokens.call_count)
 
         self.assertEqual("poisoned workflow some_workflow instance 123 roots "
                          "['parent']\n", output)
