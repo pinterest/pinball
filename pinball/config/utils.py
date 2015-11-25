@@ -187,6 +187,7 @@ def token_to_str(token):
 
 def set_django_environment():
     settings.configure(DEBUG=PinballConfig.DEBUG,
+                       ALLOWED_HOSTS=PinballConfig.ALLOWED_HOSTS,
                        SECRET_KEY=PinballConfig.SECRET_KEY,
                        INSTALLED_APPS=PinballConfig.INSTALLED_APPS,
                        MIDDLEWARE_CLASSES=PinballConfig.MIDDLEWARE_CLASSES,
