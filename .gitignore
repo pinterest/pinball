@@ -14,3 +14,7 @@
 # Virtual environment
 .env
 env
+
+# OS folder config files
+Desktop.ini
+.DS_Store
