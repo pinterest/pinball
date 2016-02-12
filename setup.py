@@ -59,7 +59,7 @@ setup(
         'oauth2client==1.2',
         'pycrypto==2.6',
         'pydot==1.0.28',
-        'python-dateutil==1.5',
+        'python-dateutil==2.4',
         'PyTrie==0.1',
         'pytz==2013b',
         'pyyaml==3.11',
