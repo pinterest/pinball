@@ -63,7 +63,7 @@ setup(
         'PyTrie==0.1',
         'pytz==2013b',
         'pyyaml==3.11',
-        'qds_sdk==1.3.0',
+        'qds_sdk==1.9.0',
         'thrift==0.8.0',
         'tox>=1.6.1',
     ],
