@@ -24,3 +24,10 @@ History
 0.2.3 (2015-09-01)
 ++++++++++++++++++
 * Fix workflow import util to be more fault tolerant.
+
+
+0.2.7 (2016-02-12)
+++++++++++++++++++
+* pydot -> pydot2.
+* upgrade qds_sdk and dateutils version.
+
