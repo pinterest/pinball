@@ -31,3 +31,7 @@ History
 * pydot -> pydot2.
 * upgrade qds_sdk and dateutils version.
 
+0.2.9 (2016-03-05)
+++++++++++++++++++
+* change pkg version spec from '==' to '>=' in setup.py
+
