@@ -93,9 +93,9 @@ class PinballConfig(object):
     MANAGERS = ADMINS
     STATIC_URL = '/static/'
     from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
-    TEMPLATE_CONTEXT_PROCESSORS = TCP + (
+    TEMPLATE_CONTEXT_PROCESSORS = list(TCP) + [
         'django.core.context_processors.request',
-    )
+    ]
 
     # Configuration for storing job log files in a remote storage.
     # By default, we disable logging to the remote storage.
