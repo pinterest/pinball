@@ -35,3 +35,8 @@ History
 ++++++++++++++++++
 * change pkg version spec from '==' to '>=' in setup.py
 
+0.2.10 (2016-03-15)
+++++++++++++++++++
+* fix pinball_config.py list/tuple issue
+
+
