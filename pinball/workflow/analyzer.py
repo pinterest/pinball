@@ -28,7 +28,6 @@ from pinball.parser.config_parser import ParserCaller
 from pinball.parser.utils import load_parser_with_caller
 from pinball.workflow.name import Name
 from pinball.workflow.event import Event
-from pinball.workflow.utils import load_path
 
 
 __author__ = 'Pawel Garbacki, Mao Ye'

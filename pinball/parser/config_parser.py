@@ -27,9 +27,12 @@ PARSER_CALLER_KEY = 'caller'
 
 class ParserCaller(object):
     ANALYZER = 'analyzer'
+    CMD_RELOAD = "cmd_reload"
+    CMD_RESCHEDULE = "cmd_reschedule"
+    CMD_START = "cmd_start"
+    GRAPH_BUILDER = 'graph_builder'
     SCHEDULE = 'schedule'
-    UI = 'ui'
-    WORKFLOW_UTIL = 'workflow_util'
+    WEB_VIEWER = "web_viewer"
 
 
 class ConfigParser(object):

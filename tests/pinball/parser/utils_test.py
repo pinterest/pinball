@@ -65,7 +65,7 @@ class UtilsTestCase(unittest.TestCase):
             'key2': 'value2',
             'key3': 3
         }
-        new_param = annotate_parser_caller(org_param, ParserCaller.UI)
+        new_param = annotate_parser_caller(org_param, ParserCaller.SCHEDULE)
 
         self.assertEquals(len(org_param), 3)
         self.assertNotIn(PARSER_CALLER_KEY, org_param.keys())

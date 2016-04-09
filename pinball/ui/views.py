@@ -34,7 +34,7 @@ from pinball.config.utils import get_log
 from pinball.tools.workflow_util import run_command
 from pinball.ui.cache_thread import get_workflows_json
 from pinball.ui.data_builder import DataBuilder
-from pinball.ui.utils import get_workflow_jobs_from_parser
+from pinball.ui.utils import get_workflow_jobs_from_parser_by_web_viewer
 from pinball.ui.workflow_graph import WorkflowGraph
 from pinball.persistence.store import DbStore
 from pinball.workflow.signaller import Signal
@@ -220,7 +220,7 @@ class ScheduleView(TemplateView):
 def jobs_from_config(request):
     try:
         workflow = request.GET['workflow']
-        jobs_data = get_workflow_jobs_from_parser(workflow)
+        jobs_data = get_workflow_jobs_from_parser_by_web_viewer(workflow)
         jobs_json = _serialize(jobs_data)
     except:
         LOG.exception('')
