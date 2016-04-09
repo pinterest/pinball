@@ -91,14 +91,10 @@ class WorkflowScheduleTestCase(unittest.TestCase):
         self.assertFalse(some_schedule.corresponds_to(
                          non_corresponding_schedule))
 
-    @mock.patch('pinball.scheduler.schedule.load_path')
+    @mock.patch('pinball.scheduler.schedule.load_parser_with_caller')
     def test_run(self, load_path_mock):
         config_parser = mock.Mock()
-
-        def load_path(params):
-            self.assertEqual([PARSER_CALLER_KEY], params.keys())
-            return config_parser
-        load_path_mock.return_value = load_path
+        load_path_mock.return_value = config_parser
         name = Name(workflow='some_workflow',
                     instance='123',
                     job_state=Name.WAITING_STATE,
@@ -110,6 +106,14 @@ class WorkflowScheduleTestCase(unittest.TestCase):
         store = EphemeralStore()
         emailer = Emailer('some_host', '8080')
         request = schedule.run(emailer, store)
+        self.assertEqual(
+            load_path_mock.call_args_list,
+            [
+                mock.call('pinball_ext.workflow.parser.PyWorkflowParser',
+                          {},
+                          'schedule')
+            ]
+        )
 
         self.assertEqual(1, len(request.updates))
 

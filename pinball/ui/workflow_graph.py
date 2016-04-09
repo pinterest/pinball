@@ -18,7 +18,7 @@
 import pydot
 
 from pinball.ui.data import Status
-from pinball.ui.utils import get_workflow_jobs_from_parser
+from pinball.ui.utils import get_workflow_jobs_from_parser_by_graph_builder
 
 
 __author__ = 'Pawel Garbacki, Mao Ye'
@@ -41,7 +41,7 @@ class WorkflowGraph(object):
 
     @staticmethod
     def from_parser(workflow):
-        data_jobs = get_workflow_jobs_from_parser(workflow)
+        data_jobs = get_workflow_jobs_from_parser_by_graph_builder(workflow)
         return WorkflowGraph(data_jobs, None)
 
     def _build(self):

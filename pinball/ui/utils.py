@@ -30,10 +30,18 @@ __license__ = 'Apache'
 __version__ = '2.0'
 
 
-def get_workflow_jobs_from_parser(workflow):
+def get_workflow_jobs_from_parser_by_web_viewer(workflow):
+    return get_workflow_jobs_from_parser(workflow, ParserCaller.WEB_VIEWER)
+
+
+def get_workflow_jobs_from_parser_by_graph_builder(workflow):
+    return get_workflow_jobs_from_parser(workflow, ParserCaller.GRAPH_BUILDER)
+
+
+def get_workflow_jobs_from_parser(workflow, parser_caller):
     config_parser = load_parser_with_caller(PinballConfig.PARSER,
                                             PinballConfig.PARSER_PARAMS,
-                                            ParserCaller.UI)
+                                            parser_caller)
     tokens = config_parser.get_workflow_tokens(workflow)
     jobs_data = []
     for token in tokens:

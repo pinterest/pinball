@@ -94,7 +94,7 @@ class Start(Command):
 
         config_parser = load_parser_with_caller(PinballConfig.PARSER,
                                                 PinballConfig.PARSER_PARAMS,
-                                                ParserCaller.WORKFLOW_UTIL)
+                                                ParserCaller.CMD_START)
         workflow_tokens = config_parser.get_workflow_tokens(self._workflow)
         if not workflow_tokens:
             return 'workflow %s not found in %s\n' % (
@@ -768,7 +768,7 @@ class ReSchedule(ModifySchedule):
     def execute(self, client, store):
         config_parser = load_parser_with_caller(PinballConfig.PARSER,
                                                 PinballConfig.PARSER_PARAMS,
-                                                ParserCaller.WORKFLOW_UTIL)
+                                                ParserCaller.CMD_RESCHEDULE)
         workflow_names = config_parser.get_workflow_names()
         if (self._workflow and not self._workflow in workflow_names):
             return 'workflow %s not found\n' % self._workflow
@@ -965,7 +965,7 @@ class Reload(Command):
     def execute(self, client, store):
         config_parser = load_parser_with_caller(PinballConfig.PARSER,
                                                 PinballConfig.PARSER_PARAMS,
-                                                ParserCaller.WORKFLOW_UTIL)
+                                                ParserCaller.CMD_RELOAD)
         workflow_names = config_parser.get_workflow_names()
         if self._workflow not in workflow_names:
             return 'workflow %s not found in %s\n' % (
