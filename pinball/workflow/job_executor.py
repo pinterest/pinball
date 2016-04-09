@@ -259,28 +259,71 @@ class ShellJobExecutor(JobExecutor):
             process.stderr: BufferedLineReader(process.stderr)}
 
     def _process_log_line(self, line):
-        """Process a log line extracting properties.
+        """Process a log line to extract properties.
+
+        It will parse every log line that starts with "PINBALL_MAGIC" and the
+        line format is expected to be:
+            "PINBALL_MAGIC:prop_name=prop_value"
+
+        prop_name and prop_value could be arbitrary text value (as long as it
+        doesn't include the magic string), but the following prop_name is
+        known to be working with Pinball UI:
+
+        "kill_id"    - the prop_value will be passed down to cleanup command
+            example: "PINBALL_MAGIC:kill_id=data_core/123456"
+
+        "kv_job_url" - the prop_value is supposed to be "anchor_text|job_url"
+                        pairs, where value is a full url to job page and key
+                        is the anchor text for this link. '|' is used to
+                        separate the anchor_text and url as it's an illegal url
+                        char according to: http://tools.ietf.org/html/rfc3986#section-2
+            example: "PINBALL_MAGIC:kv_job_url=job_123456|http://job_url_link"
+
+        The extracted properties is a map in following format: {
+            kill_id: ['executor_name1/cmd_id1', 'executor_name2/cmd_id2']
+            kv_job_url: ['job_id1|job_url1', 'job_id2|job_url2'],
+        }
+
+        NOTE:
+            1. for values we read for the same key, we will accumulate them into
+        a list, even if there is only one value for that key.
+            2. we will keep the value list unique. (no duplicated item)
 
         Args:
             line: The log line to process.
         """
+
+        def _parse_key_value(kv_text, separator):
+            k, v = None, None
+            try:
+                k, v = kv_text.split(separator, 1)
+            except Exception:
+                LOG.exception('')
+                LOG.warn("Can't parse: %s using sep: %s", kv_text, separator)
+            return k, v
+
         # A magic value marking log lines with key=value pairs.
         PINBALL_MAGIC = 'PINBALL:'
         if line.startswith(PINBALL_MAGIC):
             if not line.endswith('\n'):
-                LOG.error('PINBALL magic string is not properly terminated:')
-                LOG.error(line)
+                LOG.warn('PINBALL line is not properly terminated: %s', line)
 
             line = line.strip()
             line = line[len(PINBALL_MAGIC):]
-            delimiter_index = line.find('=')
-            key, value = (line[:delimiter_index], line[delimiter_index + 1:])
-            if key:
+            prop_key, prop_value = _parse_key_value(line, '=')
+
+            if prop_key:
                 execution_record = self._get_last_execution_record()
-                # Python guarantees that this operation is atomic so we don't
-                # need locks around it.
-                execution_record.properties[key] = value
+                if prop_key not in execution_record.properties.keys():
+                    execution_record.properties[prop_key] = []
+
+                # We might have duplicated pinball magic log lines.
+                if prop_value not in execution_record.properties[prop_key]:
+                    execution_record.properties[prop_key].append(prop_value)
+
                 self.job_dirty = True
+            else:
+                LOG.warn("Empty key is found in pinball magic string: %s", line)
 
     def _consume_logs(self, process):
         """Process logs produced by the specified process.
@@ -330,12 +373,20 @@ class ShellJobExecutor(JobExecutor):
                 self._log_savers[log_type].write(msg)
 
     def _execute_cleanup(self):
+        """Cleanup given execution of the job."""
         execution_record = self._get_last_execution_record()
         if not self.job.cleanup_template:
+            self._append_to_pinlog('cleanup template not found.')
             return None
+        if not execution_record.properties.get('kill_id', None):
+            self._append_to_pinlog('kill_id not found.')
+
         try:
-            cleanup_command = (self.job.cleanup_template %
-                               execution_record.properties)
+            # we assume the only thing needed by the template is kill_ids
+            kill_id_text = ','.join(execution_record.properties['kill_id'])
+            cleanup_command = self.job.cleanup_template % {
+                'kill_id': kill_id_text
+            }
         except KeyError:
             message = ('Could not customize cleanup command %s with '
                        'properties %s' % (self.job.cleanup_template,

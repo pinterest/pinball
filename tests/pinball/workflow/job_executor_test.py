@@ -100,15 +100,14 @@ class ShellJobExecutorTestCase(unittest.TestCase):
 
     @mock.patch('subprocess.Popen')
     def test_execute_cleanup(self, subprocess_mock):
-
-        self._executor.job.cleanup_template = 'cleanup %(job_id)s'
+        self._executor.job.cleanup_template = 'cleanup %(kill_id)s'
         execution_record = ExecutionRecord()
-        execution_record.properties['job_id'] = '123'
+        execution_record.properties['kill_id'] = ['123', '456']
         self._executor.job.history = [execution_record]
         self._executor._execute_cleanup()
         env = os.environ.copy()
         env.pop('DJANGO_SETTINGS_MODULE', None)
-        subprocess_mock.assert_called_with('cleanup 123',
+        subprocess_mock.assert_called_with('cleanup 123,456',
                                            stdout=subprocess.PIPE,
                                            stderr=subprocess.PIPE,
                                            shell=True,
@@ -220,3 +219,37 @@ class ShellJobExecutorTestCase(unittest.TestCase):
         self.assertEqual(0, execution_record.exit_code)
 
         self.assertEqual(2, get_s3_key_mock.call_count)
+
+    def test_process_log_line(self):
+        job = ShellJob(name='some_job',
+                       command="echo ok",
+                       emails=['some_email@pinterest.com'],
+                       warn_timeout_sec=10,
+                       abort_timeout_sec=20)
+        executor = ShellJobExecutor('some_workflow', '123', 'some_job', job,
+                                    self._data_builder,
+                                    self._emailer)
+        import time
+        execution_record = ExecutionRecord(instance=123456,
+                                           start_time=time.time())
+        executor.job.history.append(execution_record)
+
+        executor._process_log_line("PINBALL:kv_job_url=j_id1|j_url1\n")
+        executor._process_log_line("PINBALL:kv_job_url=j_id2|j_url2\n")
+        executor._process_log_line("PINBALL:kv_job_url=j_id2|j_url2\n")
+        executor._process_log_line("PINBALL:kill_id=qubole1/123\n")
+        executor._process_log_line("PINBALL:kill_id=qubole2/456\n")
+        executor._process_log_line("PINBALL:kill_id=qubole1/123\n")
+
+        erp = executor._get_last_execution_record().properties
+        self.assertEqual(len(erp), 2)
+
+        self.assertIn('kv_job_url', erp.keys())
+        self.assertEqual(type(erp['kv_job_url']), list)
+        self.assertEqual(len(erp['kv_job_url']), 2)
+        self.assertEqual(erp['kv_job_url'], ['j_id1|j_url1', 'j_id2|j_url2'])
+
+        self.assertIn('kill_id', erp.keys())
+        self.assertEqual(type(erp['kill_id']), list)
+        self.assertEqual(len(erp['kill_id']), 2)
+        self.assertEqual(erp['kill_id'], ['qubole1/123', 'qubole2/456'])
