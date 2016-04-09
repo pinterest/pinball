@@ -21,6 +21,7 @@ import atexit
 import os
 import select
 import signal
+import socket
 import subprocess
 import threading
 import time
@@ -220,6 +221,7 @@ class ShellJobExecutor(JobExecutor):
             return False
         execution_record = ExecutionRecord(instance=self._instance,
                                            start_time=time.time())
+        execution_record.properties['worker'] = socket.gethostname()
         self.job.history.append(execution_record)
         self.job.truncate_history()
         execution_record.events = self.job.events
