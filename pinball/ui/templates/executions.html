@@ -23,7 +23,7 @@ Pinball - Workflow Instances
       },
       "bProcessing" : true,
       "sAjaxSource" : "/ajax/executions/?" + "workflow={{ request.GET.workflow }}&" + "instance={{ request.GET.instance }}&" + "job={{ request.GET.job }}",
-      "fnCreatedRow" : addLogsLinks(false), // do not show instance
+      "fnCreatedRow" : getCreateRowFunc(false), // do not show instance
       "aoColumns" : [{
         "mData" : "execution"
       }, {

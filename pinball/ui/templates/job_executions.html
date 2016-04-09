@@ -22,7 +22,7 @@ Pinball - Workflow Instances
             "sAjaxSource": "/ajax/executions/?" +
                 "workflow={{ request.GET.workflow }}&" +
                 "job={{ request.GET.job }}",
-            "fnCreatedRow": addLogsLinks(true),  // show instance
+            "fnCreatedRow": getCreateRowFunc(true),  // show instance
             "aoColumns": [
                 { "mData": "instance" },
                 { "mData": "execution" },
