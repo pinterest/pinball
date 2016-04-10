@@ -9,8 +9,8 @@ setup(
     name='pinball',
     version=__version__,
     description='Workflow manager and scheduler',
-    author='Pawel Garbacki',
-    author_email='pawel@pinterest.com',
+    author='Pawel Garbacki, Changshu Liu',
+    author_email='pawel@pinterest.com, csliu@pinterest.com',
     url='https://github.com/pinterest/pinball',
     packages=[
         'pinball',
@@ -52,7 +52,7 @@ setup(
     install_requires=[
         'argparse>=1.2.1',
         'boto>=2.8.0',
-        'Django>=1.5.4',
+        'Django>=1.5.4,<=1.6.0',
         'guppy>=0.1.10',
         'mock>=0.8.0',
         'MySQL-python>=1.2.3',

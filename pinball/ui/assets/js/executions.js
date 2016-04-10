@@ -97,7 +97,7 @@ function getCreateRowFunc(showInstance) {
         if (run_time === null) {
             run_time = '';
         } else {
-            run_time = juration.stringify(run_time, "micro");
+            run_time = jintervals(run_time, "{D}d {h}h {m}m {s}s");
         }
         $("td:eq(" + (offset + 6) + ")", nRow).html(run_time);
 
