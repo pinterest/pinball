@@ -39,4 +39,9 @@ History
 ++++++++++++++++++
 * fix pinball_config.py list/tuple issue
 
+0.2.12 (2016-04-09)
+++++++++++++++++++
+* more precise parser caller
+* flexible worker/ui communication protocol
+* display worker node in UI
 
