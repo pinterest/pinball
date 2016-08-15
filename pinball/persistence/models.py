@@ -34,7 +34,7 @@ class TokenModel(models.Model):
     # but this is a limit for unique char fields:
     # https://docs.djangoproject.com/en/dev/ref/databases/#character-fields
     # Consider alternatives.
-    name = models.CharField(max_length=255, primary_key=True)
+    name = models.CharField(max_length=512, primary_key=True)
     owner = models.CharField(max_length=255, blank=True, null=True)
     expirationTime = models.BigIntegerField(blank=True, null=True)
     priority = models.FloatField(blank=True, null=True)
