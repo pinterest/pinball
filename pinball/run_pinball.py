@@ -183,7 +183,8 @@ def main():
         master_name(PinballConfig.MASTER_NAME)
     _pinball_imports()
     if PinballConfig.UI_HOST:
-        emailer = Emailer(PinballConfig.UI_HOST, PinballConfig.UI_PORT)
+        # the physical port should be hidden here.
+        emailer = Emailer(PinballConfig.UI_HOST, 80)
     else:
         emailer = Emailer(socket.gethostname(), PinballConfig.UI_PORT)
 
