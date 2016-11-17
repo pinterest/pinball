@@ -16,6 +16,7 @@
 import mock
 import os
 import subprocess
+import time
 import unittest
 
 from pinball.config.pinball_config import PinballConfig
@@ -219,6 +220,71 @@ class ShellJobExecutorTestCase(unittest.TestCase):
         self.assertEqual(0, execution_record.exit_code)
 
         self.assertEqual(2, get_s3_key_mock.call_count)
+
+    @mock.patch('pinball.workflow.log_saver.S3FileLogSaver._get_or_create_s3_key')
+    @mock.patch('os.path.exists')
+    @mock.patch('__builtin__.open')
+    def test_execute_env_var(self, open_mock, exists_mock, get_s3_key_mock):
+        file_mock = mock.MagicMock()
+        open_mock.return_value = file_mock
+        file_mock.__enter__.return_value = file_mock
+
+        s3_key_mock = mock.MagicMock()
+        get_s3_key_mock.return_value = s3_key_mock
+        s3_key_mock.__enter__.return_value = s3_key_mock
+
+        job_name = 'some_job'
+        workflow_name = 'some_workflow'
+        instance = '123'
+
+        job = ShellJob(name=job_name,
+                       command="echo $PINBALL_WORKFLOW && "
+                               "echo $PINBALL_JOB && "
+                               "echo $PINBALL_INSTANCE && "
+                               "echo $PINBALL_EXECUTION && "
+                               "echo $PINBALL_BASE_URL",
+                       emails=['some_email@pinterest.com'],
+                       warn_timeout_sec=10,
+                       abort_timeout_sec=20)
+        executor = ShellJobExecutor(workflow_name, instance, job_name,
+                                    job, self._data_builder,
+                                    self._emailer)
+
+        execution_record = ExecutionRecord(instance=instance,
+                                           start_time=time.time())
+        execution_record.end_time = time.time()
+        execution_record.exit_code = 1
+        job.history.append(execution_record)
+
+        self.assertTrue(executor.prepare())
+        self.assertTrue(executor.execute())
+
+        file_mock.write.assert_has_calls(
+            [mock.call(workflow_name + '\n'),
+             mock.call(job_name + '\n'),
+             mock.call(instance + '\n'),
+             mock.call('1\n')])
+
+        self.assertEqual(len(executor.job.history), 2)
+        self.assertEqual(get_s3_key_mock.call_count, len(executor.job.history))
+        latest_execution_record = executor.job.history[1]
+        self.assertEqual(latest_execution_record.exit_code, 0)
+
+        exists_mock.assert_any_call(
+            '/tmp/pinball_job_logs/{wf}/{inst}'.format(
+                wf=workflow_name, inst=instance
+            ),
+        )
+        exists_mock.assert_any_call(
+            '/tmp/pinball_job_logs/{wf}/{inst}/some_job.{ts}.stdout'.format(
+                wf=workflow_name, inst=instance, ts=int(latest_execution_record.start_time)
+            ),
+        )
+        exists_mock.assert_any_call(
+            '/tmp/pinball_job_logs/{wf}/{inst}/some_job.{ts}.stderr'.format(
+                wf=workflow_name, inst=instance, ts=int(latest_execution_record.start_time)
+            ),
+        )
 
     def test_process_log_line(self):
         job = ShellJob(name='some_job',
