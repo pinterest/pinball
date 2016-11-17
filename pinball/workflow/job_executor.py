@@ -509,6 +509,17 @@ class ShellJobExecutor(JobExecutor):
                     # Pinball sets Django module path which may interfere
                     # with the command being executed.
                     env.pop('DJANGO_SETTINGS_MODULE', None)
+
+                    # Pass workflow/instance/job/execution to the job.
+                    # This will be consumed by Dr. Elephant.
+                    env['PINBALL_WORKFLOW'] = self._workflow
+                    env['PINBALL_INSTANCE'] = self._instance
+                    env['PINBALL_JOB'] = self._job_name
+                    env['PINBALL_EXECUTION'] = str(len(self.job.history) - 1)
+
+                    if PinballConfig.UI_HOST is not None:
+                        env['PINBALL_BASE_URL'] = PinballConfig.UI_HOST
+
                     # The os.setsid() is passed in the argument preexec_fn
                     # so it's run after the fork() and before  exec() to
                     # run the shell.  It attaches a session id of the child
