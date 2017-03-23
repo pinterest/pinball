@@ -62,8 +62,6 @@ def get_s3_bucket(bucket_name):
     Returns
         s3 bucket object.
     """
-    assert PinballConfig.AWS_ACCESS_KEY_ID
-    assert PinballConfig.AWS_SECRET_ACCESS_KEY
     connection = boto.connect_s3(PinballConfig.AWS_ACCESS_KEY_ID,
                                  PinballConfig.AWS_SECRET_ACCESS_KEY)
     assert connection
