@@ -39,8 +39,8 @@ __license__ = 'Apache'
 __version__ = '2.0'
 
 
-AWS_ACCESS_KEY_ID = ''
-AWS_SECRET_ACCESS_KEY = ''
+AWS_ACCESS_KEY_ID = None
+AWS_SECRET_ACCESS_KEY = None
 if not boto.config.has_section('Boto'):
     boto.config.add_section('Boto')
     boto.config.set('Boto', 'http_socket_timeout', '180')
@@ -58,8 +58,6 @@ def config_s3_utils(aws_access_key_id, aws_secret_access_key):
     Returns:
         None
     """
-    assert aws_access_key_id
-    assert aws_secret_access_key
 
     global AWS_ACCESS_KEY_ID
     global AWS_SECRET_ACCESS_KEY
@@ -95,8 +93,6 @@ def get_s3_bucket(bucket_name):
     Returns
         s3 Boto bucket object.
     """
-    assert AWS_ACCESS_KEY_ID
-    assert AWS_SECRET_ACCESS_KEY
     connection = boto.connect_s3(AWS_ACCESS_KEY_ID,
                                  AWS_SECRET_ACCESS_KEY)
     assert connection
