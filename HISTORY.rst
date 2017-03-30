@@ -45,3 +45,8 @@ History
 * flexible worker/ui communication protocol
 * display worker node in UI
 
+0.2.13 (2017-03-30)
+++++++++++++++++++
+* tune UI time out value
+* make 80 as email port if ui host is provided
+* pydot2 -> pydot as pydot fixed incompatibility with pyparsing > 1.5.7
