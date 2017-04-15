@@ -258,7 +258,7 @@ class RequireLogin(object):
                 domain = crypter.decrypt(request.COOKIES['domain_url'])
             except CryptoException:
                 return HttpResponseRedirect('/signin/')
-            if user_id == request.COOKIES['user_id'] and user_id != '' \
+            if _hmac.compare_digest(user_id, request.COOKIES['user_id']) and user_id != '':
                     and domain in domains:
                 pass
             else:
