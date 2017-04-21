@@ -16,8 +16,18 @@
 
 import binascii
 import json
-import hmac as _hmac
 from re import compile
+
+try:
+    from hmac import compare_digest
+except ImportError:
+    def compare_digest(a, b):
+        if len(a) != len(b):
+            return False
+        result = 0
+        for x, y in zip(a, b):
+            result |= ord(x) ^ ord(y)
+        return result == 0
 
 from Crypto.Cipher import AES, ARC2
 from Crypto.Hash import HMAC, SHA256
@@ -165,7 +175,7 @@ class Crypter(object):
         hmac = HMAC.new(PinballConfig.HMAC_KEY, digestmod=SHA256)
         hmac.update(ciphertext)
         hmac.update(iv)
-        if not _hmac.compare_digest(hmac.hexdigest(), auth):
+        if not compare_digest(hmac.hexdigest(), auth):
             raise CryptoException('Decryption Failed')
         aes = AES.new(PinballConfig.AES_CBC_KEY, AES.MODE_CBC, iv)
         return aes.decrypt(ciphertext).rstrip(self._padding_char)
