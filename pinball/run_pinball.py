@@ -101,10 +101,21 @@ def _create_workers(num_workers, factory, emailer):
     return threads
 
 
-def _run_worker(factory, emailer):
-    client = factory.get_client()
-    worker = Worker(client, DbStore(), emailer)
-    worker.run()
+def _run_worker(factory, emailer, store=None):
+    store = store or DbStore()
+    while True:
+        client = factory.get_client()
+        worker = Worker(client, store, emailer)
+        try:
+            worker.run()
+            return
+        except Exception as ex:
+            if LOG:
+                LOG.exception('')
+                LOG.warn("worker thread throws due to: %s, retrying ...", str(ex))
+            else:
+                print >> sys.stderr,\
+                    "worker thread throws due to: %s, retrying ..." % str(ex)
 
 
 def _wait_for_threads(threads):

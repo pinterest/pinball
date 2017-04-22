@@ -16,10 +16,13 @@
 import copy
 import mock
 import pickle
+import random
 import time
 import unittest
 
 from pinball.master.factory import Factory
+from pinball.run_pinball import _pinball_imports
+from pinball.run_pinball import _run_worker
 from pinball.workflow.event import Event
 from pinball.workflow.name import Name
 from pinball.workflow.job import ShellJob
@@ -39,6 +42,13 @@ __copyright__ = 'Copyright 2015, Pinterest, Inc.'
 __credits__ = [__author__]
 __license__ = 'Apache'
 __version__ = '2.0'
+
+
+def _random_throw_worker_run():
+    rand_num = int(random.randrange(1, 100))
+    if rand_num % 2 == 0:
+        raise Exception("random exception from worker.run")
+    return
 
 
 class WorkerTestCase(unittest.TestCase):
@@ -457,3 +467,13 @@ class WorkerTestCase(unittest.TestCase):
         signal_token = self._get_stored_token(signal_token_name)
         signal = pickle.loads(signal_token.data)
         self.assertEqual(Signal.ARCHIVE, signal.action)
+
+    @mock.patch('pinball.workflow.worker.Worker.run',
+                side_effect=_random_throw_worker_run)
+    def test_run_worker(self, worker_run_patch):
+        _pinball_imports()
+        # just sanity check:
+        # 1. no exception even if run() throws
+        # 2. can finish within short time (no test time out)
+        _run_worker(self._factory, self._emailer, self._store)
+        self.assertGreater(worker_run_patch.call_count, 0)
