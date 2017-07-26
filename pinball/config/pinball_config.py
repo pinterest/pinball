@@ -165,7 +165,7 @@ class PinballConfig(object):
 
     # Debugging should be disabled for long running Django apps to prevent caching
     # of queries leading to ever growing memory consumption.
-    DEBUG = True
+    DEBUG = False
 
     ALLOWED_HOSTS = ['*']
 
