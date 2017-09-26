@@ -90,12 +90,15 @@ class SchedulerTestCase(unittest.TestCase):
         self._client.modify(request)
 
     def test_own_schedule_token(self):
-        self._scheduler._own_schedule_token()
-        self.assertIsNotNone(self._scheduler._owned_schedule_token)
+        self._scheduler._own_schedule_token_list()
+        self.assertIsNotNone(self._scheduler._owned_schedule_token_list)
 
     def test_advance_schedule(self):
-        self._scheduler._own_schedule_token()
+        self._scheduler._own_schedule_token_list()
+        self._scheduler._owned_schedule_token = \
+            self._scheduler._owned_schedule_token_list[0]
         token = self._scheduler._owned_schedule_token
+
         owned_schedule = pickle.loads(token.data)
         self._scheduler._advance_schedule(owned_schedule)
         now = int(time.time())
@@ -104,8 +107,11 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(token.expirationTime, schedule.next_run_time)
 
     def test_run_or_reschedule_incorrect_expiration_time(self):
-        self._scheduler._own_schedule_token()
+        self._scheduler._own_schedule_token_list()
+        self._scheduler._owned_schedule_token = \
+            self._scheduler._owned_schedule_token_list[0]
         token = self._scheduler._owned_schedule_token
+
         schedule = pickle.loads(token.data)
         schedule.next_run_time = int(time.time() + 1000)
         token.data = pickle.dumps(schedule)
@@ -113,8 +119,11 @@ class SchedulerTestCase(unittest.TestCase):
 
     def _run_or_reschedule(self, overrun_policy, is_running=True,
                            is_failed=True, is_abort_called=False):
-        self._scheduler._own_schedule_token()
+        self._scheduler._own_schedule_token_list()
+        self._scheduler._owned_schedule_token = \
+            self._scheduler._owned_schedule_token_list[0]
         token = self._scheduler._owned_schedule_token
+
         schedule = MockWorkflowSchedule(is_running, is_failed)
         schedule.overrun_policy = overrun_policy
         token.data = pickle.dumps(schedule)
