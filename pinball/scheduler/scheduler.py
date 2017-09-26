@@ -42,33 +42,38 @@ LOG = get_log('pinball.scheduler.scheduler')
 class Scheduler(object):
     # How long to own the schedule token while manipulating it.
     _LEASE_TIME_SEC = 5 * 60  # 5 minutes
-    # How long to sleep after no un-owned schedule token has been found.
-    _SLEEP_TIME_SEC = 10
+    # How long to sleep before sending another own token request.
+    # As we are doing gang scheduling, we can increase this value to avoid
+    # hammering master process too much but without loose the schedule agility.
+    _OWN_TOKEN_SLEEP_TIME_SEC = 60
     # How long to delay the schedule if it's already running and appropriate
     # policy is in place.
     _DELAY_TIME_SEC = 5 * 60  # 5 minutes
+    # The size of the workflow gang to be scheduled.
+    _SCHEDULE_GANG_SIZE = 60
 
     def __init__(self, client, store, emailer):
         self._client = client
         self._store = store
         self._emailer = emailer
         self._owned_schedule_token = None
+        self._owned_schedule_token_list = []
         self._request = None
         self._name = get_unique_name()
         self._test_only_end_if_no_unowned = False
 
-    def _own_schedule_token(self):
-        """Attempt to own a schedule token.
+    def _own_schedule_token_list(self):
+        """Attempt to own some schedule tokens.
 
-        Try to own a schedule token.  Only unowned tokens will be considered.
-        Unowned schedules are ready to run.  The ownership of the qualifying
-        job token lasts for a limited time so it has to be periodically renewed
-        if the schedule takes longer than that to run.
+        Only unowned tokens will be considered. Unowned schedules are ready to
+        run.  The ownership of the qualifying job token lasts for a limited
+        time so it has to be periodically renewed if the schedule takes longer
+        than that to run.
         """
         assert not self._owned_schedule_token
         query = Query()
         query.namePrefix = Name.SCHEDULE_PREFIX
-        query.maxTokens = 1
+        query.maxTokens = self._SCHEDULE_GANG_SIZE
         request = QueryAndOwnRequest()
         request.query = query
         request.expirationTime = int(time.time()) + Scheduler._LEASE_TIME_SEC
@@ -76,8 +81,12 @@ class Scheduler(object):
         try:
             response = self._client.query_and_own(request)
             if response.tokens:
-                assert len(response.tokens) == 1
-                self._owned_schedule_token = response.tokens[0]
+                assert len(response.tokens) <= self._SCHEDULE_GANG_SIZE
+                self._owned_schedule_token_list = [token for token in response.tokens if token]
+                LOG.info(
+                    "got %d schedule token(s) from master.",
+                    len(self._owned_schedule_token_list)
+                )
         except TokenMasterException:
             LOG.exception('')
 
@@ -98,14 +107,15 @@ class Scheduler(object):
         assert self._owned_schedule_token
         schedule = pickle.loads(self._owned_schedule_token.data)
         if schedule.next_run_time > time.time():
+            LOG.info("not the time to run token: %s", self._owned_schedule_token.name)
+
             # It's not time to run it yet.  Although we should claim only
             # tokens which are ready to run, clock skew between different
             # machines may result in claiming a token too soon.
-            assert (self._owned_schedule_token.expirationTime >=
-                    schedule.next_run_time), ('%d < %d in token %s' % (
-                        self._owned_schedule_token.expirationTime,
-                        schedule.next_run_time,
-                        token_to_str(self._owned_schedule_token)))
+            assert self._owned_schedule_token.expirationTime >= schedule.next_run_time, \
+                ('%d < %d in token %s' % (self._owned_schedule_token.expirationTime,
+                                          schedule.next_run_time,
+                                          token_to_str(self._owned_schedule_token)))
         elif (schedule.overrun_policy == OverrunPolicy.START_NEW or
               schedule.overrun_policy == OverrunPolicy.ABORT_RUNNING or
               # Ordering of the checks in the "and" condition below is
@@ -114,6 +124,8 @@ class Scheduler(object):
               ((schedule.overrun_policy != OverrunPolicy.DELAY_UNTIL_SUCCESS or
                 not schedule.is_failed(self._store)) and
                not schedule.is_running(self._store))):
+            LOG.info("run token: %s", self._owned_schedule_token.name)
+
             if schedule.overrun_policy == OverrunPolicy.ABORT_RUNNING:
                 if not self._abort_workflow(schedule):
                     return
@@ -121,9 +133,15 @@ class Scheduler(object):
             if self._request:
                 self._advance_schedule(schedule)
         elif schedule.overrun_policy == OverrunPolicy.SKIP:
+            LOG.info("skip schedule due to overrun policy for token: %s",
+                     self._owned_schedule_token.name)
+
             self._advance_schedule(schedule)
         elif (schedule.overrun_policy == OverrunPolicy.DELAY or
               schedule.overrun_policy == OverrunPolicy.DELAY_UNTIL_SUCCESS):
+            LOG.info("delay schedule due to overrun policy for token: %s",
+                     self._owned_schedule_token.name)
+
             self._owned_schedule_token.expirationTime = int(
                 time.time() + Scheduler._DELAY_TIME_SEC)
         else:
@@ -155,11 +173,23 @@ class Scheduler(object):
         """Run the scheduler."""
         LOG.info('Running scheduler ' + self._name)
         while True:
-            self._own_schedule_token()
-            if self._owned_schedule_token:
-                self._run_or_reschedule()
-                self._update_tokens()
+            start_time = time.time()
+            self._own_schedule_token_list()
+            if self._owned_schedule_token_list:
+                for s_token in self._owned_schedule_token_list:
+                    self._owned_schedule_token = s_token
+                    self._run_or_reschedule()
+                    self._update_tokens()
+                elapsed_time = time.time() - start_time
+                LOG.info("processed %d schedule token(s) in %d second(s), "
+                         "retry after %d seconds ...",
+                         len(self._owned_schedule_token_list),
+                         elapsed_time,
+                         Scheduler._OWN_TOKEN_SLEEP_TIME_SEC)
+                time.sleep(Scheduler._OWN_TOKEN_SLEEP_TIME_SEC)
             elif self._test_only_end_if_no_unowned:
                 return
             else:
-                time.sleep(Scheduler._SLEEP_TIME_SEC)
+                LOG.info("can't own any schedule token, retry after %d second(s) ...",
+                         Scheduler._OWN_TOKEN_SLEEP_TIME_SEC)
+                time.sleep(Scheduler._OWN_TOKEN_SLEEP_TIME_SEC)
