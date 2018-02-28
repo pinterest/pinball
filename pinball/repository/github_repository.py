@@ -14,8 +14,9 @@
 
 """Configuration repository stored in Github."""
 import base64
-import json
 import httplib
+import json
+import ssl
 import time
 import urlparse
 
@@ -50,7 +51,8 @@ class GithubRepository(Repository):
             The API response.
         """
         conn = httplib.HTTPSConnection(PinballConfig.GITHUB_SERVER,
-                                       timeout=PinballConfig.GITHUB_HTTP_TIMEOUT_SEC)
+                                       timeout=PinballConfig.GITHUB_HTTP_TIMEOUT_SEC,
+                                       context=ssl.create_default_context())
         location = urlparse.urljoin(PinballConfig.GITHUB_API_URI, location)
         authorization = base64.b64encode('%s:x-oauth-basic' %
                                          PinballConfig.GITHUB_OAUTH_TOKEN)
