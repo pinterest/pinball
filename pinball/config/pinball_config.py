@@ -62,12 +62,17 @@ class PinballConfig(object):
         'django.contrib.messages',
         'django.contrib.staticfiles',
     )
+    
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
     DEFAULT_MIDDLEWARE_CLASSES = (
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.common.CommonMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
+        # we use django 1.5.4, so we need this for http -> https redirects.
+        # with django >= 1.8, you can use SECURE_SSL_REDIRECT
+        'sslify.middleware.SSLifyMiddleware',
     )
 
     MIDDLEWARE_CLASSES = DEFAULT_MIDDLEWARE_CLASSES
