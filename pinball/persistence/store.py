@@ -18,14 +18,31 @@ import abc
 from pinball.config.utils import set_django_environment
 set_django_environment()
 
+import django
 from django import db
 from django.core import management
 from django.db import transaction
+
+try:
+    atomic = transaction.atomic
+except AttributeError:
+    # Django < 1.7
+    atomic = transaction.commit_on_success
 
 from pinball.config.utils import get_log
 from pinball.persistence.models import ActiveTokenModel
 from pinball.persistence.models import ArchivedTokenModel
 from pinball.persistence.models import CachedDataModel
+
+
+try:
+    close_connection = db.close_connection
+except AttributeError:
+    # close_connection() was removed in Django 1.8
+    from django.db import transaction
+
+    def close_connection():
+        db.connection.close()
 
 
 __author__ = 'Pawel Garbacki, Mao Ye'
@@ -127,9 +144,12 @@ class DbStore(Store):
     """Implementation of token store on top of a database."""
     def initialize(self):
         """Create db tables if they don't exist."""
-        management.call_command('syncdb', interactive=False)
+        if django.VERSION < (1, 7):
+            management.call_command('syncdb', interactive=False)
+        else:
+            management.call_command('migrate')
 
-    @transaction.commit_on_success
+    @atomic
     def commit_tokens(self, updates=None, deletes=None):
         updates = updates if updates is not None else []
         deletes = deletes if deletes is not None else []
@@ -140,7 +160,7 @@ class DbStore(Store):
             token_model = ActiveTokenModel.from_token(token)
             token_model.delete()
 
-    @transaction.commit_on_success
+    @atomic
     def delete_archived_tokens(self, deletes):
         for token in deletes:
             token_model = ArchivedTokenModel.from_token(token)
@@ -149,10 +169,10 @@ class DbStore(Store):
     def read_active_tokens(self, name_prefix='', name_infix='',
                            name_suffix=''):
         # Refresh the connection to make sure we read the most recent snapshot.
-        db.close_connection()
+        close_connection()
         return self._read_active_tokens(name_prefix, name_infix, name_suffix)
 
-    @transaction.commit_on_success
+    @atomic
     def _read_active_tokens(self, name_prefix='', name_infix='',
                             name_suffix=''):
         result = []
@@ -164,10 +184,10 @@ class DbStore(Store):
 
     def read_archived_tokens(self, name_prefix='', name_infix='',
                              name_suffix=''):
-        db.close_connection()
+        close_connection()
         return self._read_archived_tokens(name_prefix, name_infix, name_suffix)
 
-    @transaction.commit_on_success
+    @atomic
     def _read_archived_tokens(self, name_prefix='', name_infix='',
                               name_suffix=''):
         result = []
@@ -178,22 +198,22 @@ class DbStore(Store):
         return result
 
     def get_cached_data(self, name):
-        db.close_connection()
+        close_connection()
         return self._get_cached_data(name)
 
-    @transaction.commit_on_success
+    @atomic
     def _get_cached_data(self, name):
         try:
             return CachedDataModel.objects.get(name=name).data
         except CachedDataModel.DoesNotExist:
             return None
 
-    @transaction.commit_on_success
+    @atomic
     def set_cached_data(self, name, data):
         cached_data = CachedDataModel.from_data(name, data)
         cached_data.save()
 
-    @transaction.commit_on_success
+    @atomic
     def archive_tokens(self, tokens):
         for token in tokens:
             active_token_model = ActiveTokenModel.from_token(token)
@@ -202,10 +222,10 @@ class DbStore(Store):
             archived_token_model.save()
 
     def read_tokens(self, name_prefix='', name_infix='', name_suffix=''):
-        db.close_connection()
+        close_connection()
         return self._read_tokens(name_prefix, name_infix, name_suffix)
 
-    @transaction.commit_on_success
+    @atomic
     def _read_tokens(self, name_prefix='', name_infix='', name_suffix=''):
         result = []
         active_tokens = self._read_data(ActiveTokenModel, name_prefix,
@@ -219,7 +239,7 @@ class DbStore(Store):
         return result
 
     def read_token_names(self, name_prefix='', name_infix='', name_suffix=''):
-        db.close_connection()
+        close_connection()
         return self._read_token_names(name_prefix, name_infix, name_suffix)
 
     def _read_token_names(self, name_prefix='', name_infix='', name_suffix=''):
@@ -234,7 +254,7 @@ class DbStore(Store):
 
     def read_archived_token_names(self, name_prefix='', name_infix='',
                                   name_suffix=''):
-        db.close_connection()
+        close_connection()
         return self._read_archived_token_names(name_prefix, name_infix,
                                                name_suffix)
 
@@ -248,7 +268,7 @@ class DbStore(Store):
 
     def read_cached_data_names(self, name_prefix='', name_infix='',
                                name_suffix=''):
-        db.close_connection()
+        close_connection()
         return self._read_cached_data_names(name_prefix, name_infix,
                                             name_suffix)
 
@@ -260,7 +280,7 @@ class DbStore(Store):
         result.extend(cached_token_names)
         return result
 
-    @transaction.commit_on_success
+    @atomic
     def clear_cached_data(self):
         CachedDataModel.objects.all().delete()
 
@@ -299,7 +319,7 @@ class DbStore(Store):
         query = query_template % (selector, model.get_table_name(), where_condition)
         return query
 
-    @transaction.commit_on_success
+    @atomic
     def _read_data(self, model, name_prefix='', name_infix='',
                    name_suffix='', select_name_only=False):
         raw_query = self._customized_name_filter_query(model, name_prefix,

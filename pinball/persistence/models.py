@@ -75,6 +75,7 @@ class ActiveTokenModel(TokenModel):
         return 'active_tokens_%s' % master_name()
 
     class Meta(TokenModel.Meta):
+        app_label = 'persistence'
         # Table name is suffixed with master name.  This way multiple masters
         # can store their state in the same database.
         db_table = 'active_tokens_%s' % master_name()
@@ -96,6 +97,7 @@ class ArchivedTokenModel(TokenModel):
         return 'archived_tokens_%s' % master_name()
 
     class Meta(TokenModel.Meta):
+        app_label = 'persistence'
         db_table = 'archived_tokens_%s' % master_name()
 
 
@@ -116,4 +118,5 @@ class CachedDataModel(models.Model):
         return 'cached_data_%s' % master_name()
 
     class Meta:
+        app_label = 'persistence'
         db_table = 'cached_data_%s' % master_name()

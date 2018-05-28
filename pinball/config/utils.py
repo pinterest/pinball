@@ -28,6 +28,7 @@ import sys
 import threading
 import time
 
+import django
 from django.conf import settings
 from pinball.config.pinball_config import PinballConfig
 
@@ -167,7 +168,7 @@ def get_unique_name():
 def token_data_to_str(token_data):
     try:
         return str(pickle.loads(token_data))
-    except:
+    except Exception:
         return token_data
 
 
@@ -186,17 +187,28 @@ def token_to_str(token):
 
 
 def set_django_environment():
-    settings.configure(DEBUG=PinballConfig.DEBUG,
-                       ALLOWED_HOSTS=PinballConfig.ALLOWED_HOSTS,
-                       SECRET_KEY=PinballConfig.SECRET_KEY,
-                       INSTALLED_APPS=PinballConfig.INSTALLED_APPS,
-                       MIDDLEWARE_CLASSES=PinballConfig.MIDDLEWARE_CLASSES,
-                       ROOT_URLCONF=PinballConfig.ROOT_URLCONF,
-                       TEMPLATE_DIRS=PinballConfig.TEMPLATE_DIRS,
-                       STATICFILES_DIRS=PinballConfig.STATICFILES_DIRS,
-                       STATIC_ROOT=PinballConfig.STATIC_ROOT,
-                       MANAGERS=PinballConfig.MANAGERS,
-                       STATIC_URL=PinballConfig.STATIC_URL,
-                       TEMPLATE_CONTEXT_PROCESSORS=
-                       PinballConfig.TEMPLATE_CONTEXT_PROCESSORS,
-                       DATABASES=PinballConfig.DATABASES)
+    config = dict(
+        DEBUG=PinballConfig.DEBUG,
+        ALLOWED_HOSTS=PinballConfig.ALLOWED_HOSTS,
+        SECRET_KEY=PinballConfig.SECRET_KEY,
+        INSTALLED_APPS=PinballConfig.INSTALLED_APPS,
+        MIDDLEWARE_CLASSES=PinballConfig.MIDDLEWARE_CLASSES,
+        ROOT_URLCONF=PinballConfig.ROOT_URLCONF,
+        STATICFILES_DIRS=PinballConfig.STATICFILES_DIRS,
+        STATIC_ROOT=PinballConfig.STATIC_ROOT,
+        MANAGERS=PinballConfig.MANAGERS,
+        STATIC_URL=PinballConfig.STATIC_URL,
+        DATABASES=PinballConfig.DATABASES,
+    )
+
+    if django.VERSION < (1, 8):
+        config['TEMPLATE_CONTEXT_PROCESSORS'] = \
+            PinballConfig.TEMPLATE_CONTEXT_PROCESSORS
+        config['TEMPLATE_DIRS'] = PinballConfig.TEMPLATE_DIRS
+    else:
+        config['TEMPLATES'] = PinballConfig.TEMPLATES
+
+    settings.configure(**config)
+
+    if django.VERSION >= (1, 7):
+        django.setup()

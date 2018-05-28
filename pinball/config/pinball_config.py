@@ -26,6 +26,7 @@ __version__ = '2.0'
 
 
 class PinballConfig(object):
+    import django
 
     # GENERATION should be incremented with each change affecting any of the
     # pinball servers (master, workers, etc.)
@@ -62,7 +63,7 @@ class PinballConfig(object):
         'django.contrib.messages',
         'django.contrib.staticfiles',
     )
-    
+
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
     DEFAULT_MIDDLEWARE_CLASSES = (
@@ -86,9 +87,6 @@ class PinballConfig(object):
     import pinball.ui as project_module
     ROOT_URLCONF = 'pinball.ui.urls'
     PROJECT_ROOT = os.path.dirname(os.path.realpath(project_module.__file__))
-    TEMPLATE_DIRS = (
-        os.path.join(PROJECT_ROOT, 'templates'),
-    )
     STATICFILES_DIRS = (
         os.path.join(PROJECT_ROOT, 'assets'),
     )
@@ -97,10 +95,36 @@ class PinballConfig(object):
     )
     MANAGERS = ADMINS
     STATIC_URL = '/static/'
-    from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
-    TEMPLATE_CONTEXT_PROCESSORS = list(TCP) + [
-        'django.core.context_processors.request',
-    ]
+
+    if django.VERSION < (1, 8):
+        from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
+        TEMPLATE_CONTEXT_PROCESSORS = list(TCP) + [
+            'django.core.context_processors.request',
+        ]
+        TEMPLATE_DIRS = (
+            os.path.join(PROJECT_ROOT, 'templates'),
+        )
+    else:
+        TEMPLATES = [
+            {
+                'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                'DIRS': [
+                    os.path.join(PROJECT_ROOT, 'templates'),
+                ],
+                'APP_DIRS': True,
+                'OPTIONS': {
+                    'context_processors': [
+                        'django.contrib.auth.context_processors.auth',
+                        'django.template.context_processors.debug',
+                        'django.template.context_processors.i18n',
+                        'django.template.context_processors.media',
+                        'django.template.context_processors.static',
+                        'django.template.context_processors.request',
+                        'django.template.context_processors.tz',
+                    ],
+                },
+            },
+        ]
 
     # Configuration for storing job log files in a remote storage.
     # By default, we disable logging to the remote storage.
