@@ -126,8 +126,8 @@ class="active"
 {% endblock breadcrumb %}
 
 {% block modal %}
-{% include 'modal.html' with modal_id='modal-unschedule' command='unschedule' title='Unschedule' context='&workflow='|add:request.GET.workflow description='Remove workflow <b>'|add:request.GET.workflow|add:'</b> from schedule'|safe %}
-{% include 'modal.html' with modal_id='modal-start' command='start' title='Start' context='&workflow='|add:request.GET.workflow description='Start a new instance of workflow <b>'|add:request.GET.workflow|add:'</b>'|safe %}
+{% include 'modal.html' with modal_id='modal-unschedule' command='unschedule' title='Unschedule' ctx='&workflow='|add:request.GET.workflow description='Remove workflow <b>'|add:request.GET.workflow|add:'</b> from schedule'|safe %}
+{% include 'modal.html' with modal_id='modal-start' command='start' title='Start' ctx='&workflow='|add:request.GET.workflow description='Start a new instance of workflow <b>'|add:request.GET.workflow|add:'</b>'|safe %}
 {% include 'modal.html' with modal_id='modal-poison' title='Poison' onclick='poison()' description='Poison workflow <b>'|add:request.GET.workflow|add:'</b> roots <b><span id="poison-jobs"></span></b>'|safe %}
 {% endblock modal %}
 

@@ -59,7 +59,7 @@ class="active"
 {% endblock breadcrumb %}
 
 {% block modal %}
-{% include 'modal.html' with modal_id='modal-redo' command='redo' title='Redo' context='&workflow='|add:request.GET.workflow|add:'&instance='|add:request.GET.instance|add:'&jobs='|add:request.GET.job|add:'&execution='|add:request.GET.execution description='Redo <b>'|add:request.GET.workflow|add:'</b> instance <b>'|add:request.GET.instance|add:'</b> job <b>'|add:request.GET.job|add:'</b> execution <b>'|add:request.GET.execution|add:'</b>'|safe %}
+{% include 'modal.html' with modal_id='modal-redo' command='redo' title='Redo' ctx='&workflow='|add:request.GET.workflow|add:'&instance='|add:request.GET.instance|add:'&jobs='|add:request.GET.job|add:'&execution='|add:request.GET.execution description='Redo <b>'|add:request.GET.workflow|add:'</b> instance <b>'|add:request.GET.instance|add:'</b> job <b>'|add:request.GET.job|add:'</b> execution <b>'|add:request.GET.execution|add:'</b>'|safe %}
 {% endblock modal %}
 
 {% block content %}

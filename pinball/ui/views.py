@@ -24,8 +24,7 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import HttpResponseServerError
-from django.shortcuts import render_to_response
-from django.template.context import RequestContext
+from django.shortcuts import render
 from django.views.generic.base import TemplateView
 
 from pinball.authentication import oauth2
@@ -67,7 +66,7 @@ def workflows(_):
         LOG.exception('')
         return HttpResponseServerError(traceback.format_exc())
     else:
-        return HttpResponse(workflows_json, mimetype='application/json')
+        return HttpResponse(workflows_json, content_type='application/json')
 
 
 def instances(request):
@@ -80,7 +79,7 @@ def instances(request):
         LOG.exception('')
         return HttpResponseServerError(traceback.format_exc())
     else:
-        return HttpResponse(instances_json, mimetype='application/json')
+        return HttpResponse(instances_json, content_type='application/json')
 
 
 def jobs(request):
@@ -96,7 +95,7 @@ def jobs(request):
         LOG.exception('')
         return HttpResponseServerError(traceback.format_exc())
     else:
-        return HttpResponse(jobs_json, mimetype='application/json')
+        return HttpResponse(jobs_json, content_type='application/json')
 
 
 def graph(request):
@@ -118,7 +117,7 @@ def graph(request):
         LOG.exception('')
         return HttpResponseServerError(traceback.format_exc())
     else:
-        return HttpResponse(workflow_graph.get_svg(), mimetype='image/svg+xml')
+        return HttpResponse(workflow_graph.get_svg(), content_type='image/svg+xml')
 
 
 def executions(request):
@@ -139,7 +138,7 @@ def executions(request):
         LOG.exception('')
         return HttpResponseServerError(traceback.format_exc())
     else:
-        return HttpResponse(executions_json, mimetype='application/json')
+        return HttpResponse(executions_json, content_type='application/json')
 
 
 class ExecutionView(TemplateView):
@@ -187,7 +186,7 @@ def file_content(request):
         LOG.exception('')
         return HttpResponseServerError(traceback.format_exc())
     else:
-        return HttpResponse(file_data, mimetype='text/plain')
+        return HttpResponse(file_data, content_type='text/plain')
 
 
 def schedules(_):
@@ -199,7 +198,7 @@ def schedules(_):
         LOG.exception('')
         return HttpResponseServerError(traceback.format_exc())
     else:
-        return HttpResponse(schedules_json, mimetype='application/json')
+        return HttpResponse(schedules_json, content_type='application/json')
 
 
 class ScheduleView(TemplateView):
@@ -226,7 +225,7 @@ def jobs_from_config(request):
         LOG.exception('')
         return HttpResponseServerError(traceback.format_exc())
     else:
-        return HttpResponse(jobs_json, mimetype='application/json')
+        return HttpResponse(jobs_json, content_type='application/json')
 
 
 def command(request):
@@ -246,7 +245,7 @@ def command(request):
         LOG.exception('')
         return HttpResponseServerError(traceback.format_exc())
     else:
-        return HttpResponse(json.dumps(output), mimetype='application/json')
+        return HttpResponse(json.dumps(output), content_type='application/json')
 
 
 class TokenPathsView(TemplateView):
@@ -284,7 +283,7 @@ def token_paths(request):
         LOG.exception('')
         return HttpResponseServerError(traceback.format_exc())
     else:
-        return HttpResponse(tokens_json, mimetype='application/json')
+        return HttpResponse(tokens_json, content_type='application/json')
 
 
 class TokenView(TokenPathsView):
@@ -332,7 +331,7 @@ def status(request):
         LOG.exception('')
         return HttpResponseServerError(traceback.format_exc())
     else:
-        return HttpResponse(status_json, mimetype='application/json')
+        return HttpResponse(status_json, content_type='application/json')
 
 
 def signin(request):
@@ -343,17 +342,15 @@ def signin(request):
         if not oauth2_flow.domain_authenticated(domain):
             messages.add_message(request, SIGNIN, 'Domain not authorized: %s.' % domain,
                                  fail_silently=True)
-            return render_to_response('signin.html', context,
-                                      context_instance=RequestContext(request),
-                                      mimetype='text/html')
+            return render(request, 'signin.html', context,
+                          content_type='text/html')
         else:
             flow = oauth2_flow.get_flow(domain)
             auth_uri = flow.step1_get_authorize_url()
             return HttpResponseRedirect(auth_uri)
     else:
-        return render_to_response('signin.html', context,
-                                  context_instance=RequestContext(request),
-                                  mimetype='text/html')
+        return render(request, 'signin.html', context,
+                      content_type='text/html')
 
 
 def auth_return(request):

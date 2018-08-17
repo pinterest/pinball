@@ -97,12 +97,12 @@ class="active"
 {% endblock breadcrumb %}
 
 {% block modal %}
-{% include 'modal.html' with modal_id='modal-drain' command='drain' title='Drain' context='' description='Drain all workflows' %}
-{% include 'modal.html' with modal_id='modal-undrain' command='undrain' title='Undrain' context='' description='Undrain all workflows' %}
-{% include 'modal.html' with modal_id='modal-exit' command='exit' title='Drain and exit' context='' description='Drain and exit all workflows' %}
-{% include 'modal.html' with modal_id='modal-unexit' command='unexit' title='Undrain and unexit' context='' description='Undrain and unexit all workflows' %}
-{% include 'modal.html' with modal_id='modal-abort' command='abort' title='Abort' context='' description='Abort all workflows' %}
-{% include 'modal.html' with modal_id='modal-unabort' command='unabort' title='Unabort' context='' description='Unabort all workflows' %}
+{% include 'modal.html' with modal_id='modal-drain' command='drain' title='Drain' description='Drain all workflows' %}
+{% include 'modal.html' with modal_id='modal-undrain' command='undrain' title='Undrain' description='Undrain all workflows' %}
+{% include 'modal.html' with modal_id='modal-exit' command='exit' title='Drain and exit' description='Drain and exit all workflows' %}
+{% include 'modal.html' with modal_id='modal-unexit' command='unexit' title='Undrain and unexit' description='Undrain and unexit all workflows' %}
+{% include 'modal.html' with modal_id='modal-abort' command='abort' title='Abort' description='Abort all workflows' %}
+{% include 'modal.html' with modal_id='modal-unabort' command='unabort' title='Unabort' description='Unabort all workflows' %}
 {% endblock modal %}
 
 {% block content %}

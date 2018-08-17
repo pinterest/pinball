@@ -83,10 +83,10 @@ class="active"
 {% endblock breadcrumb %}
 
 {% block modal %}
-{% include 'modal.html' with modal_id='modal-drain' command='drain' title='Drain' context='&workflow='|add:request.GET.workflow description='Drain workflow <b>'|add:request.GET.workflow|add:'</b>'|safe %}
-{% include 'modal.html' with modal_id='modal-undrain' command='undrain' title='Undrain' context='&workflow='|add:request.GET.workflow description='Undrain workflow <b>'|add:request.GET.workflow|add:'</b>'|safe %}
-{% include 'modal.html' with modal_id='modal-abort' command='abort' title='Abort' context='&workflow='|add:request.GET.workflow description='Abort workflow <b>'|add:request.GET.workflow|add:'</b>'|safe %}
-{% include 'modal.html' with modal_id='modal-unabort' command='unabort' title='Unabort' context='&workflow='|add:request.GET.workflow description='Unabort workflow <b>'|add:request.GET.workflow|add:'</b>'|safe %}
+{% include 'modal.html' with modal_id='modal-drain' command='drain' title='Drain' ctx='&workflow='|add:request.GET.workflow description='Drain workflow <b>'|add:request.GET.workflow|add:'</b>'|safe %}
+{% include 'modal.html' with modal_id='modal-undrain' command='undrain' title='Undrain' ctx='&workflow='|add:request.GET.workflow description='Undrain workflow <b>'|add:request.GET.workflow|add:'</b>'|safe %}
+{% include 'modal.html' with modal_id='modal-abort' command='abort' title='Abort' ctx='&workflow='|add:request.GET.workflow description='Abort workflow <b>'|add:request.GET.workflow|add:'</b>'|safe %}
+{% include 'modal.html' with modal_id='modal-unabort' command='unabort' title='Unabort' ctx='&workflow='|add:request.GET.workflow description='Unabort workflow <b>'|add:request.GET.workflow|add:'</b>'|safe %}
 {% endblock modal %}
 
 {% block content %}

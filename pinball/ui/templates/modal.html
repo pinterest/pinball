@@ -19,7 +19,7 @@ role="dialog" aria-labelledby="{{modal_id}}-label" aria-hidden="true">
           Cancel
         </button>
         <button id="{{modal_id}}-confirm" class="btn btn-primary"
-        onclick="{% if command %}$('#{{modal_id}}-confirm').prop('disabled', true); makeAjaxCall('/ajax/command/?command={{command}}{{context}}', '', commandCallback('#{{modal_id}}')){% else %}{{ onclick }}{% endif %}">
+        onclick="{% if command %}$('#{{modal_id}}-confirm').prop('disabled', true); makeAjaxCall('/ajax/command/?command={{command}}{{ctx}}', '', commandCallback('#{{modal_id}}')){% else %}{{ onclick }}{% endif %}">
           Confirm
         </button>
       </div>
