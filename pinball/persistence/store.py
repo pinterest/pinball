@@ -146,8 +146,10 @@ class DbStore(Store):
         """Create db tables if they don't exist."""
         if django.VERSION < (1, 7):
             management.call_command('syncdb', interactive=False)
-        else:
+        elif django.VERSION < (1, 8):
             management.call_command('migrate')
+        else:
+            management.call_command('migrate', fake_initial=True)
 
     @atomic
     def commit_tokens(self, updates=None, deletes=None):
