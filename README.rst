@@ -124,12 +124,12 @@ After starting Pinball with the proper configuration, user can access Pinball at
 You may find there is no workflow or jobs listed in Pinball UI when you first start Pinball. To import your workflow into Pinball,
 do the following command. ::
 
-    python -m pinball.tools.workflow_util -c path/to/pinball/yaml/configuration/file -f reschedue
+    python -m pinball.tools.workflow_util -c path/to/pinball/yaml/configuration/file -f reschedule
 
 After this, you should be able to see your workflows in Pinball UI. They will be scheduled and run according to the specified schedules.
 
-.. figure:: https://github.com/pinterest/pinball/blob/master/instance_view.png
-   :alt: Workflow instance view
+.. image:: images/instance_view.png
+   :alt: Workflow Instance View
 
 Detailed Design
 -------------

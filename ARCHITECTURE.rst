@@ -10,8 +10,9 @@ The application layer introduces tokens specific to workflows, workers implement
 execution logic, a parser converting workflow specification to a collection of tokens, a scheduler 
 allowing us to prepare workflow execution ahead of time, and a UI for manual control and monitoring.
 
-.. image:: pinball_system.png
+.. image:: images/pinball_system.png
    :width: 30pt
+   :alt: Pinball System
 
 Workflow model
 ----------------
@@ -35,9 +36,10 @@ At a given time, a job is in one of the following states:
 
 Here is the job state machine:
 
-.. image:: job_states.png
+.. image:: images/job_states.png
    :width: 30pt
    :align: center
+   :alt: Job States
 
 The state machine is extremely simple which makes it easy to understand, implement, and debug. Note that there is 
 no SUCCEEDED/FAILED state. After a run finishes, it’s status gets recorded in the job history and the job transitions 
