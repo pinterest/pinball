@@ -19,6 +19,12 @@ import random
 import string
 
 
+try:
+    random = random.SystemRandom()
+except NotImplementedError:
+    logging.getLogger(__name__).error('No system level randomness available. PRNG in software is not secure.')
+
+
 __author__ = 'Changshu Liu'
 __copyright__ = 'Copyright 2015, Pinterest, Inc.'
 __credits__ = [__author__]
