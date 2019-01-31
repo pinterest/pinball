@@ -29,9 +29,9 @@ except ImportError:
             result |= ord(x) ^ ord(y)
         return result == 0
 
-from Crypto.Cipher import AES, ARC2
-from Crypto.Hash import HMAC, SHA256
-from Crypto.Random import random
+from Cryptodome.Cipher import AES, ARC2
+from Cryptodome.Hash import HMAC, SHA256
+from Cryptodome.Random import random
 from django.http import HttpResponseRedirect
 from oauth2client.client import OAuth2WebServerFlow
 
