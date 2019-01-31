@@ -211,7 +211,7 @@ class PinballConfig(object):
         yaml_file = None
         try:
             yaml_file = open(config_file, 'r')
-            config_data = yaml.load(yaml_file)
+            config_data = yaml.safe_load(yaml_file)
         except:
             raise
         finally:
