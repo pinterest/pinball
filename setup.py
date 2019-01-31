@@ -59,7 +59,7 @@ setup(
         'mock>=0.8.0',
         'MySQL-python>=1.2.3',
         'oauth2client>=1.2',
-        'pycrypto>=2.6',
+        'pycryptodomex>=3.7.2',
         'pydot>=1.2.3',
         'python-dateutil>=2.6.1',
         'PyTrie>=0.3',
