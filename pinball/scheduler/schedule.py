@@ -279,7 +279,7 @@ class WorkflowSchedule(Schedule):
             Otherwise, True.
         """
         running_instances = self._get_running_instances(store)
-        if self.max_running_instances and len(running_instances) >= self.max_running_instances:
+        if self.max_running_instances and len(running_instances) > self.max_running_instances:
             LOG.warn('Too many (%s) instances running for workflow %s !',
                      len(running_instances), workflow_name)
             if emailer:
