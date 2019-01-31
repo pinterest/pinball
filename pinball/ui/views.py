@@ -303,7 +303,7 @@ class TokenView(TokenPathsView):
 def _is_master_alive():
     try:
         s = socket.socket()
-        host = 'localhost'
+        host = PinballConfig.MASTER_HOST
         s.connect((host, PinballConfig.MASTER_PORT))
         s.close()
     except:
@@ -324,7 +324,7 @@ def status(request):
         elif data_builder.is_signal_set(workflow, instance, Signal.DRAIN):
             status = ['draining']
         if not _is_master_alive():
-            status.append('no master at %s:%d' % (socket.gethostname(),
+            status.append('no master at %s:%d' % (PinballConfig.MASTER_HOST,
                                                   PinballConfig.MASTER_PORT))
         status_json = json.dumps(status)
     except:
