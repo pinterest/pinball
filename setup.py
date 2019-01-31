@@ -64,7 +64,7 @@ setup(
         'python-dateutil>=2.6.1',
         'PyTrie>=0.3',
         'pytz>=2013b',
-        'pyyaml>=3.11',
+        'pyyaml>=4.2b1',
         'qds_sdk>=1.9.0',
         'thrift>=0.10.0',
         'tox>=1.6.1',
