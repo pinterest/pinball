@@ -88,7 +88,7 @@ class PinballConfig(object):
     ROOT_URLCONF = 'pinball.ui.urls'
     PROJECT_ROOT = os.path.dirname(os.path.realpath(project_module.__file__))
     STATICFILES_DIRS = (
-        os.path.join(PROJECT_ROOT, 'assets'),
+        os.path.join(PROJECT_ROOT, 'images'),
     )
     STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
     ADMINS = (
