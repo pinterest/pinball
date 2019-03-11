@@ -10,7 +10,7 @@ The application layer introduces tokens specific to workflows, workers implement
 execution logic, a parser converting workflow specification to a collection of tokens, a scheduler 
 allowing us to prepare workflow execution ahead of time, and a UI for manual control and monitoring.
 
-.. image:: images/pinball_system.png
+.. image:: pinball_system.png
    :width: 30pt
    :alt: Pinball System
 
@@ -36,7 +36,7 @@ At a given time, a job is in one of the following states:
 
 Here is the job state machine:
 
-.. image:: images/job_states.png
+.. image:: job_states.png
    :width: 30pt
    :align: center
    :alt: Job States
