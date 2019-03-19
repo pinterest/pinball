@@ -128,7 +128,7 @@ do the following command. ::
 
 After this, you should be able to see your workflows in Pinball UI. They will be scheduled and run according to the specified schedules.
 
-.. image:: images/instance_view.png
+.. image:: instance_view.png
    :alt: Workflow Instance View
 
 Detailed Design
