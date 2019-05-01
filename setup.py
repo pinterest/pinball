@@ -52,7 +52,7 @@ setup(
     install_requires=[
         'argparse>=1.2.1',
         'boto>=2.49.0',
-        'Django>=1.5.4,<=1.6.0',
+        'Django>=1.5.4,<1.12.0',
         'django-sslify>=0.2.7',
         'google_compute_engine>=2.8.13',
         'guppy>=0.1.10',
